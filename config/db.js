@@ -1,3 +1,3 @@
 module.exports = {
-    url: process.env.MONGODB_URI + '/bikemanager'
+    url: process.env.MONGODB_URI
 }
