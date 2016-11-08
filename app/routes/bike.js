@@ -22,6 +22,8 @@ module.exports = function(router) {
             bike.size = req.body.size;
             bike.user = req.body.user;
             bike.build = req.body.build;
+            bike.maintenance = req.body.maintenance;
+            bike.wanted = req.body.wanted;
             bike.save(function(err) {
                 if (err)
                     res.send(err);
@@ -206,7 +208,7 @@ module.exports = function(router) {
                 if (err)
                     res.send(err);
                     
-                bike.maintenance.push({ description: req.body.description });
+                bike.maintenance.push({ description: req.body.description, completeddate: req.body.completeddate });
                 bike.save(function(err) {
                     if (err)
                         res.send(err);
@@ -230,6 +232,7 @@ module.exports = function(router) {
                 var sub = bike.maintenance.id(req.params.id);
                 
                 sub.description = req.body.description;
+                sub.completeddate = req.body.completeddate;
                 
                 bike.save(function(err) {
                     if (err)

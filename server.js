@@ -12,8 +12,20 @@ mongoose.connect(db.url);
 
 app.use(bodyParser.json());
 app.use(bodyParser.json({type: "application/vnd.api+json"}));
-app.use(bodyParser.urlencoded({ extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(methodOverride('X-HTTP-Method-Override'));
+
+app.use(function(req, res, next) {
+	res.header("Access-Control-Allow-Origin", process.env.allowedsites);
+	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+	res.header("Access-Control-Allow-Methods", "'GET, POST, DELETE, OPTIONS, PUT, PATCH'");
+  
+	if (req.method === 'OPTIONS') {
+		res.sendStatus(200);
+	} else {
+		next();
+	}
+});
 
 // *** May not need since I won't be serving my app from here. ***
 // app.use(express.static(__dirname + "/public"));
