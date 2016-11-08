@@ -34,6 +34,15 @@ var router = express.Router();
 
 require('./app/routes/routes')(router);
 
+router.get('/', function(req, res) {
+	// processTemplate("Hello [employee.firstname] [employee.lastname], welcome to Amplitude Solutions.", "employee", "0798db21-f8ba-439e-ba85-b3a982c8ea1d").then(function(result) {
+	// 	res.json(result);	
+	// });
+
+	res.status(200).send("Hello World");
+});
+
+
 app.use('/api', router);
 
 app.listen(port);
