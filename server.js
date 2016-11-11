@@ -47,6 +47,6 @@ app.use('/api', router);
 
 app.listen(port);
 
-console.log("Magic happens on port " + port);
+console.log("Magic happens on port " + port + " DB URL: " + process.env.MONGODB_URI);
 
 exports = module.exports = app;
