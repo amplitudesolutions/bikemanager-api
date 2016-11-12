@@ -8,8 +8,9 @@ var db = require("./config/db");
 
 var port = process.env.PORT || 443;
 
-console.log(db.url);
 mongoose.connect(db.url, function(err, res) {
+	if (err)
+		console.log(err);
 });
 
 app.use(bodyParser.json());
