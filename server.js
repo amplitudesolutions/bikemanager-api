@@ -8,7 +8,7 @@ var db = require("./config/db");
 
 var port = process.env.PORT || 443;
 
-mongoose.connect(db.url, function(err, res) {
+mongoose.connect(db, function(err, res) {
 	if (err)
 		console.log(err);
 });
@@ -50,6 +50,6 @@ app.use('/api', router);
 
 app.listen(port);
 
-console.log("Magic happens on port " + port);
+console.log("Environment: "  + app.settings.env + " Magic happens on port " + port);
 
 exports = module.exports = app;

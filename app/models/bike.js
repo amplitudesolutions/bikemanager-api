@@ -7,7 +7,7 @@ var BikeSchema = new Schema({
     size: String,
     user: { type: Schema.Types.ObjectId, ref: 'User' },
     build: [ { description: String, url:String } ],
-    wanted: [ { description: String, url: String, qty: Number, price: Number } ],
+    wanted: [ { description: String, url: String } ],
     maintenance: [ { description: String, completeddate: Date } ]
 });
 
