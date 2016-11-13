@@ -83,6 +83,15 @@ module.exports = function(router) {
     ;
     
     router.route("/bikes/:bike_id/build")
+        .get(function(req, res) {
+            Bike.findById(req.params.bike_id, function(err, bike) {
+                if (err)
+                    res.send(err);
+
+                res.json(bike.build);
+            });
+        })
+
         .post(function(req, res) {
             Bike.findById(req.params.bike_id, function(err, bike) {
                 if (err)
@@ -102,6 +111,18 @@ module.exports = function(router) {
     ;
     
     router.route("/bikes/:bike_id/build/:id")
+
+        .get(function(req, res) {
+            Bike.findById(req.params.bike_id, function(err, bike) {
+                if (err)
+                    res.send(err);
+                
+                var build = bike.build.id(req.params.id);
+
+                res.status(200).json(build);
+            });
+        })
+
         .put(function(req, res) {
             
             Bike.findById(req.params.bike_id, function(err, bike) {
@@ -137,6 +158,15 @@ module.exports = function(router) {
     ;
     
     router.route("/bikes/:bike_id/wanted")
+        .get(function(req, res) {
+            Bike.findById(req.params.bike_id, function(err, bike) {
+                if (err)
+                    res.send(err);
+
+                res.json(bike.wanted);
+            });
+        })
+
         .post(function(req, res) {
             Bike.findById(req.params.bike_id, function(err, bike) {
                 if (err)
@@ -156,6 +186,18 @@ module.exports = function(router) {
     ;
     
     router.route("/bikes/:bike_id/wanted/:id")
+
+        .get(function(req, res) {
+            Bike.findById(req.params.bike_id, function(err, bike) {
+                if (err)
+                    res.send(err);
+                
+                var wanted = bike.wanted.id(req.params.id);
+
+                res.status(200).json(wanted);
+            });
+        })
+
         .put(function(req, res) {
             
             Bike.findById(req.params.bike_id, function(err, bike) {
@@ -216,6 +258,14 @@ module.exports = function(router) {
     ;
     
     router.route("/bikes/:bike_id/maintenance")
+        .get(function(req, res) {
+            Bike.findById(req.params.bike_id, function(err, bike) {
+                if (err)
+                    res.send(err);
+
+                res.json(bike.maintenance);
+            });
+        })
         
         .post(function(req, res) {
             Bike.findById(req.params.bike_id, function(err, bike) {
@@ -236,6 +286,18 @@ module.exports = function(router) {
     ;
     
     router.route("/bikes/:bike_id/maintenance/:id")
+
+        .get(function(req, res) {
+            Bike.findById(req.params.bike_id, function(err, bike) {
+                if (err)
+                    res.send(err);
+                
+                var maintenance = bike.maintenance.id(req.params.id);
+
+                res.status(200).json(maintenance);
+            });
+        })
+
         .put(function(req, res) {
             
             Bike.findById(req.params.bike_id, function(err, bike) {

@@ -16,7 +16,7 @@ describe('Bikes', function() {
 
 	beforeEach(function(done) {
 		// When worrying about user, will need to add a new user here... and use through out tests.
-		
+
 		var newBike = new Bike({
 			name: 'New Bike Name',
 			year: '2000',
@@ -137,93 +137,107 @@ describe('Bikes', function() {
 			});
 	});
 
-	it('should add a new part to the build /bikes/:id/build POST', function(done) {
-		chai.request(server)
-			.get('/api/bikes')
-			.end(function(err, res) {
-				var bikeId = res.body[0]._id;
-				chai.request(server)
-					.post('/api/bikes/' + bikeId + '/build')
-					.send({'description': 'Chromag Bars', 'url':'www.chromag.com'})
-					.end(function(err, res) {
-						res.should.have.status(200);
-						res.should.be.json;
-						res.body.should.be.a('object')
-						// Verify bike details haven't changed and changing the correct bike.
-						res.body.should.have.property('_id');
-						res.body._id.should.equal(bikeId);
-						res.body.should.have.property('name');
-						res.body.name.should.equal('New Bike Name');
-						res.body.should.have.property('year');
-						res.body.year.should.equal(2000);
-						res.body.should.have.property('size');
-						res.body.size.should.equal('Extra Small');
-						// Verify that it added the part to the build.
-						res.body.should.have.property('build');
-						res.body.build.length.should.equal(1);
-						res.body.build[0].should.have.property('_id');
-						res.body.build[0].should.have.property('description');
-						res.body.build[0].description.should.equal('Chromag Bars');
-						res.body.build[0].should.have.property('url');
-						res.body.build[0].url.should.equal('www.chromag.com');
-						done();
-					});
-			});
-	});
+	describe('Build Items', function() {
+		it('should get all build items for a bike /bikes/:id/build GET', function(done) {
+			chai.request(server)
+				.get('/api/bikes')
+				.end(function(err, res) {
+					var bikeId = res.body[0]._id;
+					chai.request(server)
+						.post('/api/bikes/' + bikeId + '/build')
+						.send({'description': 'Chromag Bars', 'url':'www.chromag.com'})
+						.end(function(err, res) {
+							chai.request(server)
+								.get('/api/bikes/' + bikeId + '/build')
+								.end(function(err, res) {
+									res.should.have.status(200);
+									res.should.be.json;
+									res.body.should.be.a('array');
+									res.body.length.should.equal(1);
+									res.body[0].should.have.property('_id');
+									res.body[0].should.have.property('description');
+									res.body[0].description.should.equal('Chromag Bars');
+									res.body[0].should.have.property('url');
+									res.body[0].url.should.equal('www.chromag.com');
+									done();
+								});
+						});
+				});
+		});
 
-	it('should update a bike part for a build /bikes/:bike_id/build/:id PUT', function(done) {
-		// Adding a new part to the build, should I do this initially? need to figure out.
-		chai.request(server)
-			.get('/api/bikes')
-			.end(function(err, res) {
-				chai.request(server)
-					.post('/api/bikes/' + res.body[0]._id + '/build')
-					.send({'description': 'Chromag Bars', 'url':'www.chromag.com'})
-					.end(function(err, res) {
-						var bike = res.body;
-						chai.request(server)
-						.put('/api/bikes/' + bike._id + '/build/' + bike.build[0]._id)
-						.send({'description': 'Raceface Bars', 'url': 'www.raceface.com'})
+		it('should add a new part to the build /bikes/:id/build POST', function(done) {
+			chai.request(server)
+				.get('/api/bikes')
+				.end(function(err, res) {
+					var bikeId = res.body[0]._id;
+					chai.request(server)
+						.post('/api/bikes/' + bikeId + '/build')
+						.send({'description': 'Chromag Bars', 'url':'www.chromag.com'})
 						.end(function(err, res) {
 							res.should.have.status(200);
 							res.should.be.json;
 							res.body.should.be.a('object');
+							// Verify bike details haven't changed and changing the correct bike.
 							res.body.should.have.property('_id');
-							res.body._id.should.equal(bike._id);
+							res.body._id.should.equal(bikeId);
 							res.body.should.have.property('name');
 							res.body.name.should.equal('New Bike Name');
 							res.body.should.have.property('year');
 							res.body.year.should.equal(2000);
 							res.body.should.have.property('size');
 							res.body.size.should.equal('Extra Small');
-							// res.body.should.have.property('maintenance');
 							// Verify that it added the part to the build.
 							res.body.should.have.property('build');
 							res.body.build.length.should.equal(1);
 							res.body.build[0].should.have.property('_id');
-							res.body.build[0]._id.should.equal(bike.build[0]._id);
 							res.body.build[0].should.have.property('description');
-							res.body.build[0].description.should.equal('Raceface Bars');
+							res.body.build[0].description.should.equal('Chromag Bars');
 							res.body.build[0].should.have.property('url');
-							res.body.build[0].url.should.equal('www.raceface.com');
+							res.body.build[0].url.should.equal('www.chromag.com');
 							done();
 						});
+				});
+		});
 
-					});
-			});
-	});
+		it('should get an individual build item /bikes/:bike_id/build/:id GET', function(done) {
+			chai.request(server)
+				.get('/api/bikes')
+				.end(function(err, res) {
+					var bike = res.body[0];
+					chai.request(server)
+						.post('/api/bikes/' + bike._id + '/build')
+						.send({'description': 'Chromag Bars', 'url':'www.chromag.com'})
+						.end(function(err, res) {
+							chai.request(server)
+								.get('/api/bikes/' + bike._id + '/build/' + res.body.build[0]._id)
+								.end(function(err, res) {
+									// console.log(res);
+									res.should.have.status(200);
+									res.should.be.json;
+									res.body.should.be.a('object');
+									res.body.should.have.property('description');
+									res.body.description.should.equal('Chromag Bars');
+									res.body.should.have.property('url');
+									res.body.url.should.equal('www.chromag.com');
+									done();
+								});
+						});
+				});
+		});
 
-	it('should delete a build part /bikes/:bike_id/build/:id DELETE', function(done) {
-		chai.request(server)
-			.get('/api/bikes')
-			.end(function(err, res) {
-				var bike = res.body[0];
-				chai.request(server)
-					.post('/api/bikes/' + bike._id + '/build')
-					.send({'description': 'Chromag Bars', 'url':'www.chromag.com'})
-					.end(function(err, res) {
-						chai.request(server)
-							.delete('/api/bikes/' + res.body._id + '/build/' + res.body.build[0]._id)
+		it('should update a bike part for a build /bikes/:bike_id/build/:id PUT', function(done) {
+			// Adding a new part to the build, should I do this initially? need to figure out.
+			chai.request(server)
+				.get('/api/bikes')
+				.end(function(err, res) {
+					chai.request(server)
+						.post('/api/bikes/' + res.body[0]._id + '/build')
+						.send({'description': 'Chromag Bars', 'url':'www.chromag.com'})
+						.end(function(err, res) {
+							var bike = res.body;
+							chai.request(server)
+							.put('/api/bikes/' + bike._id + '/build/' + bike.build[0]._id)
+							.send({'description': 'Raceface Bars', 'url': 'www.raceface.com'})
 							.end(function(err, res) {
 								res.should.have.status(200);
 								res.should.be.json;
@@ -236,101 +250,155 @@ describe('Bikes', function() {
 								res.body.year.should.equal(2000);
 								res.body.should.have.property('size');
 								res.body.size.should.equal('Extra Small');
-								res.body.build.length.should.equal(0);
+								// res.body.should.have.property('maintenance');
+								// Verify that it added the part to the build.
+								res.body.should.have.property('build');
+								res.body.build.length.should.equal(1);
+								res.body.build[0].should.have.property('_id');
+								res.body.build[0]._id.should.equal(bike.build[0]._id);
+								res.body.build[0].should.have.property('description');
+								res.body.build[0].description.should.equal('Raceface Bars');
+								res.body.build[0].should.have.property('url');
+								res.body.build[0].url.should.equal('www.raceface.com');
 								done();
 							});
-					});
-				
-			});
+
+						});
+				});
+		});
+
+		it('should delete a build part /bikes/:bike_id/build/:id DELETE', function(done) {
+			chai.request(server)
+				.get('/api/bikes')
+				.end(function(err, res) {
+					var bike = res.body[0];
+					chai.request(server)
+						.post('/api/bikes/' + bike._id + '/build')
+						.send({'description': 'Chromag Bars', 'url':'www.chromag.com'})
+						.end(function(err, res) {
+							chai.request(server)
+								.delete('/api/bikes/' + res.body._id + '/build/' + res.body.build[0]._id)
+								.end(function(err, res) {
+									res.should.have.status(200);
+									res.should.be.json;
+									res.body.should.be.a('object');
+									res.body.should.have.property('_id');
+									res.body._id.should.equal(bike._id);
+									res.body.should.have.property('name');
+									res.body.name.should.equal('New Bike Name');
+									res.body.should.have.property('year');
+									res.body.year.should.equal(2000);
+									res.body.should.have.property('size');
+									res.body.size.should.equal('Extra Small');
+									res.body.build.length.should.equal(0);
+									done();
+								});
+						});
+					
+				});
+		});
 	});
 
-	it('should add a new wanted item /bikes/:id/wanted POST', function(done) {
-		chai.request(server)
-			.get('/api/bikes')
-			.end(function(err, res) {
-				var bikeId = res.body[0]._id;
-				chai.request(server)
-					.post('/api/bikes/' + bikeId + '/wanted')
-					.send({'description': 'Chromag Bars', 'url':'www.chromag.com'})
-					.end(function(err, res) {
-						res.should.have.status(200);
-						res.should.be.json;
-						res.body.should.be.a('object')
-						// Verify bike details haven't changed and changing the correct bike.
-						res.body.should.have.property('_id');
-						res.body._id.should.equal(bikeId);
-						res.body.should.have.property('name');
-						res.body.name.should.equal('New Bike Name');
-						res.body.should.have.property('year');
-						res.body.year.should.equal(2000);
-						res.body.should.have.property('size');
-						res.body.size.should.equal('Extra Small');
-						// Verify that it added the part to the build.
-						res.body.should.have.property('wanted');
-						res.body.wanted.length.should.equal(1);
-						res.body.wanted[0].should.have.property('_id');
-						res.body.wanted[0].should.have.property('description');
-						res.body.wanted[0].description.should.equal('Chromag Bars');
-						res.body.wanted[0].should.have.property('url');
-						res.body.wanted[0].url.should.equal('www.chromag.com');
-						done();
-					});
-			});
-	});
+	describe('Wanted Items', function() {
+		it('should get all build items for a bike /bikes/:id/wanted GET', function(done) {
+			chai.request(server)
+				.get('/api/bikes')
+				.end(function(err, res) {
+					var bikeId = res.body[0]._id;
+					chai.request(server)
+						.post('/api/bikes/' + bikeId + '/wanted')
+						.send({'description': 'Chromag Bars', 'url':'www.chromag.com'})
+						.end(function(err, res) {
+							chai.request(server)
+								.get('/api/bikes/' + bikeId + '/wanted')
+								.end(function(err, res) {
+									res.should.have.status(200);
+									res.should.be.json;
+									res.body.should.be.a('array');
+									res.body.length.should.equal(1);
+									res.body[0].should.have.property('_id');
+									res.body[0].should.have.property('description');
+									res.body[0].description.should.equal('Chromag Bars');
+									res.body[0].should.have.property('url');
+									res.body[0].url.should.equal('www.chromag.com');
+									done();
+								});
+						});
+				});
+		});
 
-	it('should update a wanted item /bikes/:bike_id/wanted/:id PUT', function(done) {
-		// Adding a new part to the build, should I do this initially? need to figure out.
-		chai.request(server)
-			.get('/api/bikes')
-			.end(function(err, res) {
-				chai.request(server)
-					.post('/api/bikes/' + res.body[0]._id + '/wanted')
-					.send({'description': 'Chromag Bars', 'url':'www.chromag.com'})
-					.end(function(err, res) {
-						var bike = res.body;
-						chai.request(server)
-						.put('/api/bikes/' + bike._id + '/wanted/' + bike.wanted[0]._id)
-						.send({'description': 'Raceface Bars', 'url': 'www.raceface.com'})
+		it('should add a new wanted item /bikes/:id/wanted POST', function(done) {
+			chai.request(server)
+				.get('/api/bikes')
+				.end(function(err, res) {
+					var bikeId = res.body[0]._id;
+					chai.request(server)
+						.post('/api/bikes/' + bikeId + '/wanted')
+						.send({'description': 'Chromag Bars', 'url':'www.chromag.com'})
 						.end(function(err, res) {
 							res.should.have.status(200);
 							res.should.be.json;
-							res.body.should.be.a('object');
+							res.body.should.be.a('object')
+							// Verify bike details haven't changed and changing the correct bike.
 							res.body.should.have.property('_id');
-							res.body._id.should.equal(bike._id);
+							res.body._id.should.equal(bikeId);
 							res.body.should.have.property('name');
 							res.body.name.should.equal('New Bike Name');
 							res.body.should.have.property('year');
 							res.body.year.should.equal(2000);
 							res.body.should.have.property('size');
 							res.body.size.should.equal('Extra Small');
-							// res.body.should.have.property('maintenance');
 							// Verify that it added the part to the build.
 							res.body.should.have.property('wanted');
 							res.body.wanted.length.should.equal(1);
 							res.body.wanted[0].should.have.property('_id');
-							res.body.wanted[0]._id.should.equal(bike.wanted[0]._id);
 							res.body.wanted[0].should.have.property('description');
-							res.body.wanted[0].description.should.equal('Raceface Bars');
+							res.body.wanted[0].description.should.equal('Chromag Bars');
 							res.body.wanted[0].should.have.property('url');
-							res.body.wanted[0].url.should.equal('www.raceface.com');
+							res.body.wanted[0].url.should.equal('www.chromag.com');
 							done();
 						});
+				});
+		});
 
-					});
-			});
-	});
+		it('should get an individual wanted item /bikes/:bike_id/wanted/:id GET', function(done) {
+			chai.request(server)
+				.get('/api/bikes')
+				.end(function(err, res) {
+					var bike = res.body[0];
+					chai.request(server)
+						.post('/api/bikes/' + bike._id + '/wanted')
+						.send({'description': 'Chromag Bars', 'url':'www.chromag.com'})
+						.end(function(err, res) {
+							chai.request(server)
+								.get('/api/bikes/' + bike._id + '/wanted/' + res.body.wanted[0]._id)
+								.end(function(err, res) {
+									res.should.have.status(200);
+									res.should.be.json;
+									res.body.should.be.a('object');
+									res.body.should.have.property('description');
+									res.body.description.should.equal('Chromag Bars');
+									res.body.should.have.property('url');
+									res.body.url.should.equal('www.chromag.com');
+									done();
+								});
+						});
+				});
+		});
 
-	it('should delete a wanted item /bikes/:bike_id/wanted/:id DELETE', function(done) {
-		chai.request(server)
-			.get('/api/bikes')
-			.end(function(err, res) {
-				var bike = res.body[0];
-				chai.request(server)
-					.post('/api/bikes/' + bike._id + '/wanted')
-					.send({'description': 'Chromag Bars', 'url':'www.chromag.com'})
-					.end(function(err, res) {
-						chai.request(server)
-							.delete('/api/bikes/' + res.body._id + '/wanted/' + res.body.wanted[0]._id)
+		it('should update a wanted item /bikes/:bike_id/wanted/:id PUT', function(done) {
+			// Adding a new part to the build, should I do this initially? need to figure out.
+			chai.request(server)
+				.get('/api/bikes')
+				.end(function(err, res) {
+					chai.request(server)
+						.post('/api/bikes/' + res.body[0]._id + '/wanted')
+						.send({'description': 'Chromag Bars', 'url':'www.chromag.com'})
+						.end(function(err, res) {
+							var bike = res.body;
+							chai.request(server)
+							.put('/api/bikes/' + bike._id + '/wanted/' + bike.wanted[0]._id)
+							.send({'description': 'Raceface Bars', 'url': 'www.raceface.com'})
 							.end(function(err, res) {
 								res.should.have.status(200);
 								res.should.be.json;
@@ -343,101 +411,193 @@ describe('Bikes', function() {
 								res.body.year.should.equal(2000);
 								res.body.should.have.property('size');
 								res.body.size.should.equal('Extra Small');
-								res.body.wanted.length.should.equal(0);
+								// res.body.should.have.property('maintenance');
+								// Verify that it added the part to the build.
+								res.body.should.have.property('wanted');
+								res.body.wanted.length.should.equal(1);
+								res.body.wanted[0].should.have.property('_id');
+								res.body.wanted[0]._id.should.equal(bike.wanted[0]._id);
+								res.body.wanted[0].should.have.property('description');
+								res.body.wanted[0].description.should.equal('Raceface Bars');
+								res.body.wanted[0].should.have.property('url');
+								res.body.wanted[0].url.should.equal('www.raceface.com');
 								done();
 							});
-					});
-				
-			});
+
+						});
+				});
+		});
+
+		it('should delete a wanted item /bikes/:bike_id/wanted/:id DELETE', function(done) {
+			chai.request(server)
+				.get('/api/bikes')
+				.end(function(err, res) {
+					var bike = res.body[0];
+					chai.request(server)
+						.post('/api/bikes/' + bike._id + '/wanted')
+						.send({'description': 'Chromag Bars', 'url':'www.chromag.com'})
+						.end(function(err, res) {
+							chai.request(server)
+								.delete('/api/bikes/' + res.body._id + '/wanted/' + res.body.wanted[0]._id)
+								.end(function(err, res) {
+									res.should.have.status(200);
+									res.should.be.json;
+									res.body.should.be.a('object');
+									res.body.should.have.property('_id');
+									res.body._id.should.equal(bike._id);
+									res.body.should.have.property('name');
+									res.body.name.should.equal('New Bike Name');
+									res.body.should.have.property('year');
+									res.body.year.should.equal(2000);
+									res.body.should.have.property('size');
+									res.body.size.should.equal('Extra Small');
+									res.body.wanted.length.should.equal(0);
+									done();
+								});
+						});
+					
+				});
+		});
+
+		it('should move a wanted item to the build and remove wanted item /bikes/:bike_id/wanted/:id/got', function(done) {
+			chai.request(server)
+				.get('/api/bikes')
+				.end(function(err, res) {
+					var bike = res.body[0];
+					chai.request(server)
+						.post('/api/bikes/' + bike._id + '/wanted')
+						.send({'description': 'Chromag Bars', 'url':'www.chromag.com'})
+						.end(function(err, res) {
+							chai.request(server)
+								.get('/api/bikes/' + bike._id + '/wanted/' + res.body.wanted[0]._id + '/got')
+								.end(function(err, res) {
+									res.should.have.status(200);
+									res.should.be.json;
+									res.body.should.be.a('object');
+									res.body.should.have.property('_id');
+									res.body._id.should.equal(bike._id);
+									res.body.should.have.property('name');
+									res.body.name.should.equal('New Bike Name');
+									res.body.should.have.property('year');
+									res.body.year.should.equal(2000);
+									res.body.should.have.property('size');
+									res.body.size.should.equal('Extra Small');
+									res.body.wanted.length.should.equal(0);
+									res.body.build.length.should.equal(1);
+									res.body.build[0].should.have.property('_id');
+									res.body.build[0].should.have.property('description');
+									res.body.build[0].description.should.equal('Chromag Bars');
+									res.body.build[0].should.have.property('url');
+									res.body.build[0].url.should.equal('www.chromag.com');
+									done();
+								});
+						});
+					
+				});
+		});
 	});
 
-	it('should add a new maintenance item /bikes/:id/maintenance POST', function(done) {
-		chai.request(server)
-			.get('/api/bikes')
-			.end(function(err, res) {
-				var bikeId = res.body[0]._id;
-				chai.request(server)
-					.post('/api/bikes/' + bikeId + '/maintenance')
-					.send({'description': 'Front Brake Bleed', 'completeddate': new Date('11/12/2016') })
-					.end(function(err, res) {
-						res.should.have.status(200);
-						res.should.be.json;
-						res.body.should.be.a('object')
-						// Verify bike details haven't changed and changing the correct bike.
-						res.body.should.have.property('_id');
-						res.body._id.should.equal(bikeId);
-						res.body.should.have.property('name');
-						res.body.name.should.equal('New Bike Name');
-						res.body.should.have.property('year');
-						res.body.year.should.equal(2000);
-						res.body.should.have.property('size');
-						res.body.size.should.equal('Extra Small');
-						// Verify that it added the part to the build.
-						res.body.should.have.property('maintenance');
-						res.body.maintenance.length.should.equal(1);
-						res.body.maintenance[0].should.have.property('_id');
-						res.body.maintenance[0].should.have.property('description');
-						res.body.maintenance[0].description.should.equal('Front Brake Bleed');
-						res.body.maintenance[0].should.have.property('completeddate');
-						res.body.maintenance[0].completeddate.should.equal(new Date('11/12/2016').toJSON());
-						done();
-					});
-			});
-	});
+	describe('Maintenance Items', function() {
 
-	it('should update a maintenance item /bikes/:bike_id/maintenance/:id PUT', function(done) {
-		// Adding a new part to the build, should I do this initially? need to figure out.
-		chai.request(server)
-			.get('/api/bikes')
-			.end(function(err, res) {
-				chai.request(server)
-					.post('/api/bikes/' + res.body[0]._id + '/maintenance')
-					.send({'description': 'Front Barke Bleed', 'completeddate':''})
-					.end(function(err, res) {
-						var bike = res.body;
-						chai.request(server)
-						.put('/api/bikes/' + bike._id + '/maintenance/' + bike.maintenance[0]._id)
+		it('should get all build items for a bike /bikes/:id/maintenance GET', function(done) {
+			chai.request(server)
+				.get('/api/bikes')
+				.end(function(err, res) {
+					var bikeId = res.body[0]._id;
+					chai.request(server)
+						.post('/api/bikes/' + bikeId + '/maintenance')
 						.send({'description': 'Front Brake Bleed', 'completeddate': new Date('11/12/2016')})
+						.end(function(err, res) {
+							chai.request(server)
+								.get('/api/bikes/' + bikeId + '/maintenance')
+								.end(function(err, res) {
+									res.should.have.status(200);
+									res.should.be.json;
+									res.body.should.be.a('array');
+									res.body.length.should.equal(1);
+									res.body[0].should.have.property('_id');
+									res.body[0].should.have.property('description');
+									res.body[0].description.should.equal('Front Brake Bleed');
+									res.body[0].should.have.property('completeddate');
+									res.body[0].completeddate.should.equal(new Date('11/12/2016').toJSON());
+									done();
+								});
+						});
+				});
+		});
+
+		it('should add a new maintenance item /bikes/:id/maintenance POST', function(done) {
+			chai.request(server)
+				.get('/api/bikes')
+				.end(function(err, res) {
+					var bikeId = res.body[0]._id;
+					chai.request(server)
+						.post('/api/bikes/' + bikeId + '/maintenance')
+						.send({'description': 'Front Brake Bleed', 'completeddate': new Date('11/12/2016') })
 						.end(function(err, res) {
 							res.should.have.status(200);
 							res.should.be.json;
-							res.body.should.be.a('object');
+							res.body.should.be.a('object')
+							// Verify bike details haven't changed and changing the correct bike.
 							res.body.should.have.property('_id');
-							res.body._id.should.equal(bike._id);
+							res.body._id.should.equal(bikeId);
 							res.body.should.have.property('name');
 							res.body.name.should.equal('New Bike Name');
 							res.body.should.have.property('year');
 							res.body.year.should.equal(2000);
 							res.body.should.have.property('size');
 							res.body.size.should.equal('Extra Small');
-							// res.body.should.have.property('maintenance');
 							// Verify that it added the part to the build.
 							res.body.should.have.property('maintenance');
 							res.body.maintenance.length.should.equal(1);
 							res.body.maintenance[0].should.have.property('_id');
-							res.body.maintenance[0]._id.should.equal(bike.maintenance[0]._id);
 							res.body.maintenance[0].should.have.property('description');
 							res.body.maintenance[0].description.should.equal('Front Brake Bleed');
 							res.body.maintenance[0].should.have.property('completeddate');
 							res.body.maintenance[0].completeddate.should.equal(new Date('11/12/2016').toJSON());
 							done();
 						});
+				});
+		});
 
-					});
-			});
-	});
+		it('should get an individual maintenance item /bikes/:bike_id/maintenance/:id GET', function(done) {
+			chai.request(server)
+				.get('/api/bikes')
+				.end(function(err, res) {
+					var bike = res.body[0];
+					chai.request(server)
+						.post('/api/bikes/' + bike._id + '/maintenance')
+						.send({'description': 'Front Brake Bleed', 'completeddate': new Date('11/12/2016')})
+						.end(function(err, res) {
+							chai.request(server)
+								.get('/api/bikes/' + bike._id + '/maintenance/' + res.body.maintenance[0]._id)
+								.end(function(err, res) {
+									res.should.have.status(200);
+									res.should.be.json;
+									res.body.should.be.a('object');
+									res.body.should.have.property('description');
+									res.body.description.should.equal('Front Brake Bleed');
+									res.body.should.have.property('completeddate');
+									res.body.completeddate.should.equal(new Date('11/12/2016').toJSON());
+									done();
+								});
+						});
+				});
+		});
 
-	it('should delete a maintenance item /bikes/:bike_id/maintenance/:id DELETE', function(done) {
-		chai.request(server)
-			.get('/api/bikes')
-			.end(function(err, res) {
-				var bike = res.body[0];
-				chai.request(server)
-					.post('/api/bikes/' + bike._id + '/maintenance')
-					.send({'description': 'Rear Brake Bleed', 'completeddate':''})
-					.end(function(err, res) {
-						chai.request(server)
-							.delete('/api/bikes/' + res.body._id + '/maintenance/' + res.body.maintenance[0]._id)
+		it('should update a maintenance item /bikes/:bike_id/maintenance/:id PUT', function(done) {
+			// Adding a new part to the build, should I do this initially? need to figure out.
+			chai.request(server)
+				.get('/api/bikes')
+				.end(function(err, res) {
+					chai.request(server)
+						.post('/api/bikes/' + res.body[0]._id + '/maintenance')
+						.send({'description': 'Front Barke Bleed', 'completeddate':''})
+						.end(function(err, res) {
+							var bike = res.body;
+							chai.request(server)
+							.put('/api/bikes/' + bike._id + '/maintenance/' + bike.maintenance[0]._id)
+							.send({'description': 'Front Brake Bleed', 'completeddate': new Date('11/12/2016')})
 							.end(function(err, res) {
 								res.should.have.status(200);
 								res.should.be.json;
@@ -450,48 +610,53 @@ describe('Bikes', function() {
 								res.body.year.should.equal(2000);
 								res.body.should.have.property('size');
 								res.body.size.should.equal('Extra Small');
-								res.body.maintenance.length.should.equal(0);
+								// res.body.should.have.property('maintenance');
+								// Verify that it added the part to the build.
+								res.body.should.have.property('maintenance');
+								res.body.maintenance.length.should.equal(1);
+								res.body.maintenance[0].should.have.property('_id');
+								res.body.maintenance[0]._id.should.equal(bike.maintenance[0]._id);
+								res.body.maintenance[0].should.have.property('description');
+								res.body.maintenance[0].description.should.equal('Front Brake Bleed');
+								res.body.maintenance[0].should.have.property('completeddate');
+								res.body.maintenance[0].completeddate.should.equal(new Date('11/12/2016').toJSON());
 								done();
 							});
-					});
-				
-			});
+
+						});
+				});
+		});
+
+		it('should delete a maintenance item /bikes/:bike_id/maintenance/:id DELETE', function(done) {
+			chai.request(server)
+				.get('/api/bikes')
+				.end(function(err, res) {
+					var bike = res.body[0];
+					chai.request(server)
+						.post('/api/bikes/' + bike._id + '/maintenance')
+						.send({'description': 'Rear Brake Bleed', 'completeddate':''})
+						.end(function(err, res) {
+							chai.request(server)
+								.delete('/api/bikes/' + res.body._id + '/maintenance/' + res.body.maintenance[0]._id)
+								.end(function(err, res) {
+									res.should.have.status(200);
+									res.should.be.json;
+									res.body.should.be.a('object');
+									res.body.should.have.property('_id');
+									res.body._id.should.equal(bike._id);
+									res.body.should.have.property('name');
+									res.body.name.should.equal('New Bike Name');
+									res.body.should.have.property('year');
+									res.body.year.should.equal(2000);
+									res.body.should.have.property('size');
+									res.body.size.should.equal('Extra Small');
+									res.body.maintenance.length.should.equal(0);
+									done();
+								});
+						});
+					
+				});
+		});
 	});
 
-	it('should move a wanted item to the build and remove wanted item /bikes/:bike_id/wanted/:id/got', function(done) {
-		chai.request(server)
-			.get('/api/bikes')
-			.end(function(err, res) {
-				var bike = res.body[0];
-				chai.request(server)
-					.post('/api/bikes/' + bike._id + '/wanted')
-					.send({'description': 'Chromag Bars', 'url':'www.chromag.com'})
-					.end(function(err, res) {
-						chai.request(server)
-							.get('/api/bikes/' + bike._id + '/wanted/' + res.body.wanted[0]._id + '/got')
-							.end(function(err, res) {
-								res.should.have.status(200);
-								res.should.be.json;
-								res.body.should.be.a('object');
-								res.body.should.have.property('_id');
-								res.body._id.should.equal(bike._id);
-								res.body.should.have.property('name');
-								res.body.name.should.equal('New Bike Name');
-								res.body.should.have.property('year');
-								res.body.year.should.equal(2000);
-								res.body.should.have.property('size');
-								res.body.size.should.equal('Extra Small');
-								res.body.wanted.length.should.equal(0);
-								res.body.build.length.should.equal(1);
-								res.body.build[0].should.have.property('_id');
-								res.body.build[0].should.have.property('description');
-								res.body.build[0].description.should.equal('Chromag Bars');
-								res.body.build[0].should.have.property('url');
-								res.body.build[0].url.should.equal('www.chromag.com');
-								done();
-							});
-					});
-				
-			});
-	});
-})
+});
