@@ -1,25 +1,26 @@
 {
-    "name": "bike-manager-API",
-    "main": "server.js",
-    "version": "1.0.0",
-    "engines": {
-        "node": "6.2.1",
-        "npm": "3.9.3"
-    },
-    "repository": "https://github.com/amplitudesolutions/bike-manager-api.git",
-    "license": "MIT",
-    "dependencies": {
-        "express": "~4.13.4",
-        "mongoose": "~4.1.9",
-        "body-parser": "~1.0.1",
-        "method-override": "~2.0.2"
-    },
-    "devDependencies": {
-        "chai": "~3.5.0",
-        "chai-http": "~3.0.0",
-        "mocha": "~3.1.2"
-    },
-    "scripts": {
-        "test": "mocha test/test-bike.js"
-    }
+  "name": "bike-manager-API",
+  "main": "server.js",
+  "version": "1.0.0",
+  "engines": {
+    "node": "6.2.1",
+    "npm": "3.9.3"
+  },
+  "repository": "https://github.com/amplitudesolutions/bike-manager-api.git",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "~1.15.2",
+    "express": "~4.13.4",
+    "jsonwebtoken": "^7.1.9",
+    "method-override": "~2.3.6",
+    "mongoose": "~4.6.8"
+  },
+  "devDependencies": {
+    "chai": "~3.5.0",
+    "chai-http": "~3.0.0",
+    "mocha": "~3.1.2"
+  },
+  "scripts": {
+    "test": "mocha test/test*"
+  }
 }

@@ -5,7 +5,7 @@ module.exports = function(router) {
     router.route('/bikes')
         
         .get(function(req, res) {
-            Bike.find(function(err, bikes) {
+            Bike.find({user: req.decoded._doc._id}, function(err, bikes) {
                 if (err)
                     res.send(err);
                     
@@ -18,7 +18,7 @@ module.exports = function(router) {
             bike.name = req.body.name;
             bike.year = req.body.year;
             bike.size = req.body.size;
-            bike.user = req.body.user;
+            bike.user = req.decoded._doc._id;
             bike.build = req.body.build;
             bike.maintenance = req.body.maintenance;
             bike.wanted = req.body.wanted;
@@ -30,6 +30,7 @@ module.exports = function(router) {
             });
         })
         
+        // Admin Route to delete all Bikes... need to remove eventually.
         .delete(function(req, res) {
             Bike.remove(function(err) {
                 if (err)
