@@ -88,7 +88,7 @@ describe('Users', function() {
 				
 				chai.request(server)
 					.get('/api/users')
-					.set('x-access-token', token)
+					.set('authorization', token)
 					.end(function(err, res) {
 						res.should.have.status(200);
 						res.should.be.json;

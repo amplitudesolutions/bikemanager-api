@@ -53,7 +53,7 @@ describe('Bikes', function() {
 				
 				chai.request(server)
 					.get('/api/bikes')
-					.set('x-access-token', results.token)
+					.set('authorization', results.token)
 					.end(function(err, res) {
 						res.should.have.status(200);
 						res.should.be.json;
@@ -81,7 +81,7 @@ describe('Bikes', function() {
 		
 				chai.request(server)
 				.post('/api/bikes')
-				.set('x-access-token', results.token)
+				.set('authorization', results.token)
 				.send({'name': 'Transition', 'year': '2016', 'size': 'Large'})
 				.end(function(err, res) {
 					res.should.have.status(200);
@@ -118,7 +118,7 @@ describe('Bikes', function() {
 				newBike.save(function(err, data) {
 					chai.request(server)
 						.get('/api/bikes/' + data.id)
-						.set('x-access-token', results.token)
+						.set('authorization', results.token)
 						.end(function(err, res) {
 							res.should.have.status(200);
 							res.should.be.json;
@@ -148,11 +148,11 @@ describe('Bikes', function() {
 				
 				chai.request(server)
 					.get('/api/bikes')
-					.set('x-access-token',results.token)
+					.set('authorization',results.token)
 					.end(function(err, res) {
 						chai.request(server)
 							.put('/api/bikes/' + res.body[0]._id)
-							.set('x-access-token', results.token)
+							.set('authorization', results.token)
 							.send({'name': 'Rocky Slayer', 'year': '1999', 'size': 'Extra Large'})
 							.end(function(err, res) {
 								res.should.have.status(200);
@@ -181,11 +181,11 @@ describe('Bikes', function() {
 			
 				chai.request(server)
 					.get('/api/bikes')
-					.set('x-access-token', token)
+					.set('authorization', token)
 					.end(function(err, res) {
 						chai.request(server)
 							.delete('/api/bikes/' + res.body[0]._id)
-							.set('x-access-token', token)
+							.set('authorization', token)
 							.end(function(err, res) {
 								res.should.have.status(200);
 								res.should.be.json;
@@ -207,17 +207,17 @@ describe('Bikes', function() {
 				
 					chai.request(server)
 						.get('/api/bikes')
-						.set('x-access-token', token)
+						.set('authorization', token)
 						.end(function(err, res) {
 							var bikeId = res.body[0]._id;
 							chai.request(server)
 								.post('/api/bikes/' + bikeId + '/build')
-								.set('x-access-token', token)
+								.set('authorization', token)
 								.send({'description': 'Chromag Bars', 'url':'www.chromag.com'})
 								.end(function(err, res) {
 									chai.request(server)
 										.get('/api/bikes/' + bikeId + '/build')
-										.set('x-access-token', token)
+										.set('authorization', token)
 										.end(function(err, res) {
 											res.should.have.status(200);
 											res.should.be.json;
@@ -244,12 +244,12 @@ describe('Bikes', function() {
 				
 				chai.request(server)
 					.get('/api/bikes')
-					.set('x-access-token', results.token)
+					.set('authorization', results.token)
 					.end(function(err, res) {
 						var bikeId = res.body[0]._id;
 						chai.request(server)
 							.post('/api/bikes/' + bikeId + '/build')
-							.set('x-access-token', results.token)
+							.set('authorization', results.token)
 							.send({'description': 'Chromag Bars', 'url':'www.chromag.com'})
 							.end(function(err, res) {
 								res.should.have.status(200);
@@ -288,17 +288,17 @@ describe('Bikes', function() {
 				
 				chai.request(server)
 					.get('/api/bikes')
-					.set('x-access-token', token)
+					.set('authorization', token)
 					.end(function(err, res) {
 						var bike = res.body[0];
 						chai.request(server)
 							.post('/api/bikes/' + bike._id + '/build')
-							.set('x-access-token', token)
+							.set('authorization', token)
 							.send({'description': 'Chromag Bars', 'url':'www.chromag.com'})
 							.end(function(err, res) {
 								chai.request(server)
 									.get('/api/bikes/' + bike._id + '/build/' + res.body.build[0]._id)
-									.set('x-access-token', token)
+									.set('authorization', token)
 									.end(function(err, res) {
 										// console.log(res);
 										res.should.have.status(200);
@@ -325,17 +325,17 @@ describe('Bikes', function() {
 				// Adding a new part to the build, should I do this initially? need to figure out.
 				chai.request(server)
 					.get('/api/bikes')
-					.set('x-access-token', results.token)
+					.set('authorization', results.token)
 					.end(function(err, res) {
 						chai.request(server)
 							.post('/api/bikes/' + res.body[0]._id + '/build')
-							.set('x-access-token', results.token)
+							.set('authorization', results.token)
 							.send({'description': 'Chromag Bars', 'url':'www.chromag.com'})
 							.end(function(err, res) {
 								var bike = res.body;
 								chai.request(server)
 								.put('/api/bikes/' + bike._id + '/build/' + bike.build[0]._id)
-								.set('x-access-token', results.token)
+								.set('authorization', results.token)
 								.send({'description': 'Raceface Bars', 'url': 'www.raceface.com'})
 								.end(function(err, res) {
 									res.should.have.status(200);
@@ -377,17 +377,17 @@ describe('Bikes', function() {
 				
 				chai.request(server)
 					.get('/api/bikes')
-					.set('x-access-token', results.token)
+					.set('authorization', results.token)
 					.end(function(err, res) {
 						var bike = res.body[0];
 						chai.request(server)
 							.post('/api/bikes/' + bike._id + '/build')
-							.set('x-access-token', results.token)
+							.set('authorization', results.token)
 							.send({'description': 'Chromag Bars', 'url':'www.chromag.com'})
 							.end(function(err, res) {
 								chai.request(server)
 									.delete('/api/bikes/' + res.body._id + '/build/' + res.body.build[0]._id)
-									.set('x-access-token', results.token)
+									.set('authorization', results.token)
 									.end(function(err, res) {
 										res.should.have.status(200);
 										res.should.be.json;
@@ -421,17 +421,17 @@ describe('Bikes', function() {
 				
 					chai.request(server)
 						.get('/api/bikes')
-						.set('x-access-token', token)
+						.set('authorization', token)
 						.end(function(err, res) {
 							var bikeId = res.body[0]._id;
 							chai.request(server)
 								.post('/api/bikes/' + bikeId + '/wanted')
-								.set('x-access-token', token)
+								.set('authorization', token)
 								.send({'description': 'Chromag Bars', 'url':'www.chromag.com'})
 								.end(function(err, res) {
 									chai.request(server)
 										.get('/api/bikes/' + bikeId + '/wanted')
-										.set('x-access-token', token)
+										.set('authorization', token)
 										.end(function(err, res) {
 											res.should.have.status(200);
 											res.should.be.json;
@@ -458,12 +458,12 @@ describe('Bikes', function() {
 				
 					chai.request(server)
 						.get('/api/bikes')
-						.set('x-access-token', results.token)
+						.set('authorization', results.token)
 						.end(function(err, res) {
 							var bikeId = res.body[0]._id;
 							chai.request(server)
 								.post('/api/bikes/' + bikeId + '/wanted')
-								.set('x-access-token', results.token)
+								.set('authorization', results.token)
 								.send({'description': 'Chromag Bars', 'url':'www.chromag.com'})
 								.end(function(err, res) {
 									res.should.have.status(200);
@@ -502,17 +502,17 @@ describe('Bikes', function() {
 				
 					chai.request(server)
 						.get('/api/bikes')
-						.set('x-access-token', token)
+						.set('authorization', token)
 						.end(function(err, res) {
 							var bike = res.body[0];
 							chai.request(server)
 								.post('/api/bikes/' + bike._id + '/wanted')
-								.set('x-access-token', token)
+								.set('authorization', token)
 								.send({'description': 'Chromag Bars', 'url':'www.chromag.com'})
 								.end(function(err, res) {
 									chai.request(server)
 										.get('/api/bikes/' + bike._id + '/wanted/' + res.body.wanted[0]._id)
-										.set('x-access-token', token)
+										.set('authorization', token)
 										.end(function(err, res) {
 											res.should.have.status(200);
 											res.should.be.json;
@@ -538,17 +538,17 @@ describe('Bikes', function() {
 					// Adding a new part to the build, should I do this initially? need to figure out.
 					chai.request(server)
 						.get('/api/bikes')
-						.set('x-access-token', results.token)
+						.set('authorization', results.token)
 						.end(function(err, res) {
 							chai.request(server)
 								.post('/api/bikes/' + res.body[0]._id + '/wanted')
-								.set('x-access-token', results.token)
+								.set('authorization', results.token)
 								.send({'description': 'Chromag Bars', 'url':'www.chromag.com'})
 								.end(function(err, res) {
 									var bike = res.body;
 									chai.request(server)
 									.put('/api/bikes/' + bike._id + '/wanted/' + bike.wanted[0]._id)
-									.set('x-access-token', results.token)
+									.set('authorization', results.token)
 									.send({'description': 'Raceface Bars', 'url': 'www.raceface.com'})
 									.end(function(err, res) {
 										res.should.have.status(200);
@@ -590,17 +590,17 @@ describe('Bikes', function() {
 				
 					chai.request(server)
 						.get('/api/bikes')
-						.set('x-access-token', results.token)
+						.set('authorization', results.token)
 						.end(function(err, res) {
 							var bike = res.body[0];
 							chai.request(server)
 								.post('/api/bikes/' + bike._id + '/wanted')
-								.set('x-access-token', results.token)
+								.set('authorization', results.token)
 								.send({'description': 'Chromag Bars', 'url':'www.chromag.com'})
 								.end(function(err, res) {
 									chai.request(server)
 										.delete('/api/bikes/' + res.body._id + '/wanted/' + res.body.wanted[0]._id)
-										.set('x-access-token', results.token)
+										.set('authorization', results.token)
 										.end(function(err, res) {
 											res.should.have.status(200);
 											res.should.be.json;
@@ -631,17 +631,17 @@ describe('Bikes', function() {
 				
 					chai.request(server)
 						.get('/api/bikes')
-						.set('x-access-token', results.token)
+						.set('authorization', results.token)
 						.end(function(err, res) {
 							var bike = res.body[0];
 							chai.request(server)
 								.post('/api/bikes/' + bike._id + '/wanted')
-								.set('x-access-token', results.token)
+								.set('authorization', results.token)
 								.send({'description': 'Chromag Bars', 'url':'www.chromag.com'})
 								.end(function(err, res) {
 									chai.request(server)
 										.get('/api/bikes/' + bike._id + '/wanted/' + res.body.wanted[0]._id + '/got')
-										.set('x-access-token', results.token)
+										.set('authorization', results.token)
 										.end(function(err, res) {
 											res.should.have.status(200);
 											res.should.be.json;
@@ -681,17 +681,17 @@ describe('Bikes', function() {
 				
 					chai.request(server)
 						.get('/api/bikes')
-						.set('x-access-token', token)
+						.set('authorization', token)
 						.end(function(err, res) {
 							var bikeId = res.body[0]._id;
 							chai.request(server)
 								.post('/api/bikes/' + bikeId + '/maintenance')
-								.set('x-access-token', token)
+								.set('authorization', token)
 								.send({'description': 'Front Brake Bleed', 'completeddate': new Date('11/12/2016')})
 								.end(function(err, res) {
 									chai.request(server)
 										.get('/api/bikes/' + bikeId + '/maintenance')
-										.set('x-access-token', token)
+										.set('authorization', token)
 										.end(function(err, res) {
 											res.should.have.status(200);
 											res.should.be.json;
@@ -718,12 +718,12 @@ describe('Bikes', function() {
 				
 					chai.request(server)
 						.get('/api/bikes')
-						.set('x-access-token', results.token)
+						.set('authorization', results.token)
 						.end(function(err, res) {
 							var bikeId = res.body[0]._id;
 							chai.request(server)
 								.post('/api/bikes/' + bikeId + '/maintenance')
-								.set('x-access-token', results.token)
+								.set('authorization', results.token)
 								.send({'description': 'Front Brake Bleed', 'completeddate': new Date('11/12/2016') })
 								.end(function(err, res) {
 									res.should.have.status(200);
@@ -762,17 +762,17 @@ describe('Bikes', function() {
 				
 					chai.request(server)
 						.get('/api/bikes')
-						.set('x-access-token', token)
+						.set('authorization', token)
 						.end(function(err, res) {
 							var bike = res.body[0];
 							chai.request(server)
 								.post('/api/bikes/' + bike._id + '/maintenance')
-								.set('x-access-token', token)
+								.set('authorization', token)
 								.send({'description': 'Front Brake Bleed', 'completeddate': new Date('11/12/2016')})
 								.end(function(err, res) {
 									chai.request(server)
 										.get('/api/bikes/' + bike._id + '/maintenance/' + res.body.maintenance[0]._id)
-										.set('x-access-token', token)
+										.set('authorization', token)
 										.end(function(err, res) {
 											res.should.have.status(200);
 											res.should.be.json;
@@ -798,17 +798,17 @@ describe('Bikes', function() {
 					// Adding a new part to the build, should I do this initially? need to figure out.
 					chai.request(server)
 						.get('/api/bikes')
-						.set('x-access-token', results.token)
+						.set('authorization', results.token)
 						.end(function(err, res) {
 							chai.request(server)
 								.post('/api/bikes/' + res.body[0]._id + '/maintenance')
-								.set('x-access-token', results.token)
+								.set('authorization', results.token)
 								.send({'description': 'Front Barke Bleed', 'completeddate':''})
 								.end(function(err, res) {
 									var bike = res.body;
 									chai.request(server)
 									.put('/api/bikes/' + bike._id + '/maintenance/' + bike.maintenance[0]._id)
-									.set('x-access-token', results.token)
+									.set('authorization', results.token)
 									.send({'description': 'Front Brake Bleed', 'completeddate': new Date('11/12/2016')})
 									.end(function(err, res) {
 										res.should.have.status(200);
@@ -850,17 +850,17 @@ describe('Bikes', function() {
 				
 					chai.request(server)
 						.get('/api/bikes')
-						.set('x-access-token', results.token)
+						.set('authorization', results.token)
 						.end(function(err, res) {
 							var bike = res.body[0];
 							chai.request(server)
 								.post('/api/bikes/' + bike._id + '/maintenance')
-								.set('x-access-token', results.token)
+								.set('authorization', results.token)
 								.send({'description': 'Rear Brake Bleed', 'completeddate':''})
 								.end(function(err, res) {
 									chai.request(server)
 										.delete('/api/bikes/' + res.body._id + '/maintenance/' + res.body.maintenance[0]._id)
-										.set('x-access-token', results.token)
+										.set('authorization', results.token)
 										.end(function(err, res) {
 											res.should.have.status(200);
 											res.should.be.json;
