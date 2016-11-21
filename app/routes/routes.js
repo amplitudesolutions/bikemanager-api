@@ -37,16 +37,27 @@ module.exports = function(router) {
             user.email = req.body.email;
             user.password = req.body.password;
             
-            user.save(function(err) {
+            User.findOne({email: user.email}, function(err, data){
                 if (err)
                     res.send(err);
                 
-                // Change use to an object, so I can remove the password, so it isn't sent back with the JSON object.
-                var newUser = user.toObject();
-                delete newUser["password"];
-                
-                res.json(newUser);
+                if (data) {
+                    res.status(400).json({message: 'Email Already Exists'});
+                } else {
+                    user.save(function(err) {
+                        if (err)
+                            res.send(err);
+                        
+                        // Change use to an object, so I can remove the password, so it isn't sent back with the JSON object.
+                        var newUser = user.toObject();
+                        delete newUser["password"];
+                        
+                        res.json(newUser);
+                    });
+                }
             });
+
+            
         });
     
     // middleware to use for all requests
