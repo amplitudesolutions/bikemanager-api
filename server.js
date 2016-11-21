@@ -8,6 +8,7 @@ var db = require("./config/db");
 
 var port = process.env.PORT || 443;
 
+mongoose.Promise = require('q').Promise;
 mongoose.connect(db, function(err, res) {
 	if (err)
 		console.log(err);

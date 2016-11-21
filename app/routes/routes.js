@@ -1,5 +1,6 @@
 var User = require('../models/user');
 var jwt = require("jsonwebtoken");
+var bcrypt = require("bcryptjs");
 
 module.exports = function(router) {
     
@@ -14,17 +15,21 @@ module.exports = function(router) {
                 if (!user) {
                     res.status(400).json({message: 'user not found'});
                 } else if (user) {
-                    if (user.password != req.body.password) {
-                        res.status(400).json({message: 'password incorrect'});
-                    } else {
-                        var token = jwt.sign(user, process.env.SECRET, {
-                            expiresIn: 1440
-                        });
-                        
-                        var cleanUser = user.toObject();
-                        delete cleanUser['password'];
-                        res.status(200).json({message: 'Authentication successful', token: token, user: cleanUser});
-                    }
+                    bcrypt.compare(req.body.password, user.password, function(err, response) {
+                        user.password != req.body.password
+                        if (response) {
+                            var token = jwt.sign(user, process.env.SECRET, {
+                                expiresIn: 1440
+                            });
+                            
+                            var cleanUser = user.toObject();
+                            delete cleanUser['password'];
+                            res.status(200).json({message: 'Authentication successful', token: token, user: cleanUser});
+                        } else {
+                            res.status(400).json({message: 'password incorrect'});
+                        }
+                    });
+                    
                 }
             });
         });
@@ -35,24 +40,31 @@ module.exports = function(router) {
             var user = new User();
             user.name = req.body.name;
             user.email = req.body.email;
-            user.password = req.body.password;
+            // user.password = req.body.password;
             
             User.findOne({email: user.email}, function(err, data){
                 if (err)
                     res.send(err);
                 
                 if (data) {
-                    res.status(400).json({message: 'Email Already Exists'});
+                    res.status(409).json({message: 'Email Already Exists'});
                 } else {
-                    user.save(function(err) {
+                    bcrypt.hash(req.body.password, 10, function(err, hash) {
                         if (err)
                             res.send(err);
-                        
-                        // Change use to an object, so I can remove the password, so it isn't sent back with the JSON object.
-                        var newUser = user.toObject();
-                        delete newUser["password"];
-                        
-                        res.json(newUser);
+
+                        user.password = hash;
+
+                        user.save(function(err) {
+                            if (err)
+                                res.send(err);
+                            
+                            // Change use to an object, so I can remove the password, so it isn't sent back with the JSON object.
+                            var newUser = user.toObject();
+                            delete newUser["password"];
+                            
+                            res.json(newUser);
+                        });
                     });
                 }
             });

@@ -17,25 +17,33 @@ describe('Bikes', function() {
 	Bike.collection.drop();
 
 	beforeEach(function(done) {
-		// When worrying about user, will need to add a new user here... and use through out tests.
-		var newUser = new User({
-			name: 'John Doe',
-			email: 'jdoe@doe.com',
-			password: 'the password'
-		});
+		// Create a default user in db.
+		chai.request(server)
+			.post('/api/users')
+			.send({'name': 'John Doe', 'email': 'jdoe@doe.com', 'password': 'the password'})
+			.end(function(err, res) {
+				res.should.have.status(200);
+				res.should.be.json;
+				res.body.should.be.a('object')
+				res.body.should.have.property('_id');
+				res.body.should.have.property('name');
+				res.body.name.should.equal('John Doe');
+				res.body.should.have.property('email');
+				res.body.email.should.equal('jdoe@doe.com');
+				res.body.should.not.have.property('password');
+
+				var newBike = new Bike({
+					name: 'New Bike Name',
+					year: '2000',
+					size: 'Extra Small',
+					user: res.body._id
+				});
 		
-		newUser.save(function(err, data) {
-			var newBike = new Bike({
-				name: 'New Bike Name',
-				year: '2000',
-				size: 'Extra Small',
-				user: data._id
+				newBike.save(function(err) {
+					done();
+				});
 			});
-	
-			newBike.save(function(err) {
-				done();
-			});
-		});
+
 	});
 
 	afterEach(function(done) {
@@ -58,6 +66,7 @@ describe('Bikes', function() {
 						res.should.have.status(200);
 						res.should.be.json;
 						res.body.should.be.a('array');
+						res.body.length.should.equal(1);
 						res.body[0].should.have.property('_id');
 						res.body[0].should.have.property('name');
 						res.body[0].name.should.equal('New Bike Name');

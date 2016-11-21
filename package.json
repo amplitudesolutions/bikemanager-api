@@ -9,11 +9,13 @@
   "repository": "https://github.com/amplitudesolutions/bike-manager-api.git",
   "license": "MIT",
   "dependencies": {
+    "bcryptjs": "~2.3.0",
     "body-parser": "~1.15.2",
     "express": "~4.13.4",
-    "jsonwebtoken": "^7.1.9",
+    "jsonwebtoken": "~7.1.9",
     "method-override": "~2.3.6",
-    "mongoose": "~4.6.8"
+    "mongoose": "~4.6.8",
+    "q": "~1.4.1"
   },
   "devDependencies": {
     "chai": "~3.5.0",

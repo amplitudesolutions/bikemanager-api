@@ -16,15 +16,32 @@ describe('Users', function() {
 
 	beforeEach(function(done) {
 		// When worrying about user, will need to add a new user here... and use through out tests.
-		var newUser = new User({
-			name: 'John Doe',
-			email: 'jdoe@doe.com',
-			password: 'the password'
-		});
+		// var newUser = new User({
+		// 	name: 'John Doe',
+		// 	email: 'jdoe@doe.com',
+		// 	password: 'the password'
+		// });
 		
-		newUser.save(function(err, data) {
-			done();
-		})
+		// newUser.save(function(err, data) {
+		// 	done();
+		// })
+
+		// Create a default user in db.
+		chai.request(server)
+			.post('/api/users')
+			.send({'name': 'John Doe', 'email': 'jdoe@doe.com', 'password': 'the password'})
+			.end(function(err, res) {
+				res.should.have.status(200);
+				res.should.be.json;
+				res.body.should.be.a('object')
+				res.body.should.have.property('_id');
+				res.body.should.have.property('name');
+				res.body.name.should.equal('John Doe');
+				res.body.should.have.property('email');
+				res.body.email.should.equal('jdoe@doe.com');
+				res.body.should.not.have.property('password');
+				done();
+			});
 
 	});
 
@@ -121,6 +138,39 @@ describe('Users', function() {
 				res.body.email.should.equal('jane.doe@doe.com');
 				res.body.should.not.have.property('password');
 				done();
+			});
+	});
+
+	it('should return 409 error when trying to add an email that already exists.', function(done) {
+		chai.request(server)
+			.post('/api/users')
+			.send({'name': 'John Doe', 'email': 'jdoe@doe.com', 'password': 'another password'})
+			.end(function(err, res) {
+				res.should.have.status(409);
+				res.should.be.json;
+				res.should.be.a('object')
+				
+				chai.request(server)
+					.post('/api/authenticate')
+					.send({'email': 'jdoe@doe.com', 'password': 'the password'})
+					.end(function(err, res) {
+						var token = res.body.token;
+						
+						chai.request(server)
+							.get('/api/users')
+							.set('authorization', token)
+							.end(function(err, res) {
+								res.body.should.be.a('array');
+								res.body.length.should.equal(1);
+								res.body[0].should.have.property('_id');
+								res.body[0].should.have.property('name');
+								res.body[0].name.should.equal('John Doe');
+								res.body[0].should.have.property('email');
+								res.body[0].email.should.equal('jdoe@doe.com');
+								res.body[0].should.not.have.property('password');
+								done();
+							});
+					});
 			});
 	});
 });
