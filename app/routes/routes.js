@@ -19,7 +19,7 @@ module.exports = function(router) {
                         user.password != req.body.password
                         if (response) {
                             var token = jwt.sign(user, process.env.SECRET, {
-                                expiresIn: 1440
+                                expiresIn: 86400
                             });
                             
                             var cleanUser = user.toObject();
@@ -110,5 +110,6 @@ module.exports = function(router) {
     // http://www.codekitchen.ca/guide-to-structuring-and-building-a-restful-api-using-express-4/
     require("./user")(router);
     require("./bike")(router);
+    require("./maintenance")(router);
     
 }

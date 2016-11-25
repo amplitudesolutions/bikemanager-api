@@ -1,14 +1,21 @@
 
 var Bike = require('../models/bike');
+var Maintenance = require('../models/bike-maintenance');
+
+// Need to set defaults for Populate (this is only for maintenance)
+var popOptions = {path: 'maintenance', match: {completeddate: null}};
+
 
 module.exports = function(router) {
     router.route('/bikes')
         
         .get(function(req, res) {
-            Bike.find({user: req.decoded._doc._id}, function(err, bikes) {
+            Bike.find({user: req.decoded._doc._id})
+            .populate(popOptions)
+            .exec(function(err, bikes) {
                 if (err)
                     res.send(err);
-                    
+
                 res.status(200).json(bikes);
             });
         })
@@ -20,7 +27,7 @@ module.exports = function(router) {
             bike.size = req.body.size;
             bike.user = req.decoded._doc._id;
             bike.build = req.body.build;
-            bike.maintenance = req.body.maintenance;
+            // bike.maintenance = req.body.maintenance;
             bike.wanted = req.body.wanted;
             bike.save(function(err) {
                 if (err)
@@ -35,7 +42,17 @@ module.exports = function(router) {
             Bike.remove(function(err) {
                 if (err)
                     res.send(err);
-                    
+                
+                Maintenance.remove(function(err) {
+                    if (err)
+                        res.send(err);
+
+                    User.remove(function(err) {
+                        if (err)
+                            res.send(err);
+                    })
+                })
+
                 res.json({message: "bikes deleted"});
             });  
         })
@@ -44,10 +61,12 @@ module.exports = function(router) {
     router.route("/bikes/:id")
     
         .get(function(req, res) {
-            Bike.findById(req.params.id, function(err, bike) {
+            Bike.findOne({_id: req.params.id})
+            .populate(popOptions)
+            .exec(function(err, bike) {
                 if (err)
                     res.send(err);
-                    
+                
                 res.status(200).json(bike);
             });
         })
@@ -260,76 +279,49 @@ module.exports = function(router) {
     
     router.route("/bikes/:bike_id/maintenance")
         .get(function(req, res) {
-            Bike.findById(req.params.bike_id, function(err, bike) {
-                if (err)
-                    res.send(err);
+            Bike.findById(req.params.bike_id)
+                .populate('maintenance')
+                .exec(function(err, bike) {
+                    if (err)
+                        res.send(err);
 
-                res.json(bike.maintenance);
-            });
+                    res.json(bike.maintenance);
+                });
         })
         
         .post(function(req, res) {
-            Bike.findById(req.params.bike_id, function(err, bike) {
-                if (err)
-                    res.send(err);
-                    
-                bike.maintenance.push({ description: req.body.description, completeddate: req.body.completeddate });
-                bike.save(function(err) {
+            Bike.findById(req.params.bike_id)
+                .populate('maintenance')
+                .exec(function(err, bike) {
                     if (err)
                         res.send(err);
+                    
+                    var maintenanceItem = new Maintenance({
+                        description: req.body.description, completeddate: req.body.completeddate, bike: req.params.bike_id
+                    });
+
+                    maintenanceItem.save(function(err) {
+                        if (err)
+                            res.send(err);
+
+                        bike.maintenance.push(maintenanceItem);
+                        bike.save(function(err) {
+                            if (err)
+                                res.send(err);
+                                
+                            Bike.populate(bike, 'maintenance', function(err, bike) {
+                                res.json(bike);    
+                            })
+                                
+                        });
                         
-                    res.json(bike);    
+                    });
+                    //bike.maintenance.push({  });
+                    
+                    
                 });
-                
-            });
         })
         
     ;
     
-    router.route("/bikes/:bike_id/maintenance/:id")
-
-        .get(function(req, res) {
-            Bike.findById(req.params.bike_id, function(err, bike) {
-                if (err)
-                    res.send(err);
-                
-                var maintenance = bike.maintenance.id(req.params.id);
-
-                res.status(200).json(maintenance);
-            });
-        })
-
-        .put(function(req, res) {
-            
-            Bike.findById(req.params.bike_id, function(err, bike) {
-                if (err)
-                    res.send(err);
-                    
-                var sub = bike.maintenance.id(req.params.id);
-                
-                sub.description = req.body.description;
-                sub.completeddate = req.body.completeddate;
-                
-                bike.save(function(err) {
-                    if (err)
-                        res.send(err);
-                        
-                    res.status(200).json(bike);
-                })
-                
-            })
-        })
-        
-        .delete(function(req, res) {
-            Bike.findById(req.params.bike_id, function(err, bike) {
-                bike.maintenance.id(req.params.id).remove();
-                bike.save(function(err) {
-                    if (err)
-                        res.send(err);
-                        
-                    res.status(200).json(bike);
-                });
-            });
-        })
-    ;
 }

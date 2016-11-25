@@ -16,16 +16,7 @@ describe('Users', function() {
 
 	beforeEach(function(done) {
 		// When worrying about user, will need to add a new user here... and use through out tests.
-		// var newUser = new User({
-		// 	name: 'John Doe',
-		// 	email: 'jdoe@doe.com',
-		// 	password: 'the password'
-		// });
-		
-		// newUser.save(function(err, data) {
-		// 	done();
-		// })
-
+	
 		// Create a default user in db.
 		chai.request(server)
 			.post('/api/users')

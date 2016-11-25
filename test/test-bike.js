@@ -681,7 +681,7 @@ describe('Bikes', function() {
 
 	describe('Maintenance Items', function() {
 
-		it('should get all build items for a bike /bikes/:id/maintenance GET', function(done) {
+		it('should get all maintenance items for a bike /bikes/:id/maintenance GET', function(done) {
 			chai.request(server)
 				.post('/api/authenticate')
 				.send({'email': 'jdoe@doe.com', 'password': 'the password'})
@@ -718,7 +718,7 @@ describe('Bikes', function() {
 				});
 		});
 
-		it('should add a new maintenance item /bikes/:id/maintenance POST', function(done) {
+		it('should add a new maintenance item to a bike /bikes/:id/maintenance POST', function(done) {
 			chai.request(server)
 				.post('/api/authenticate')
 				.send({'email': 'jdoe@doe.com', 'password': 'the password'})
@@ -748,7 +748,7 @@ describe('Bikes', function() {
 									res.body.should.have.property('size');
 									res.body.size.should.equal('Extra Small');
 									res.body.user.should.equal(results.user._id);
-									// Verify that it added the part to the build.
+									// Verify that it added the maintenance item.
 									res.body.should.have.property('maintenance');
 									res.body.maintenance.length.should.equal(1);
 									res.body.maintenance[0].should.have.property('_id');
@@ -757,135 +757,6 @@ describe('Bikes', function() {
 									res.body.maintenance[0].should.have.property('completeddate');
 									res.body.maintenance[0].completeddate.should.equal(new Date('11/12/2016').toJSON());
 									done();
-								});
-						});
-				});
-		});
-
-		it('should get an individual maintenance item /bikes/:bike_id/maintenance/:id GET', function(done) {
-			chai.request(server)
-				.post('/api/authenticate')
-				.send({'email': 'jdoe@doe.com', 'password': 'the password'})
-				.end(function(err, res) {
-					var token = res.body.token;
-				
-					chai.request(server)
-						.get('/api/bikes')
-						.set('authorization', token)
-						.end(function(err, res) {
-							var bike = res.body[0];
-							chai.request(server)
-								.post('/api/bikes/' + bike._id + '/maintenance')
-								.set('authorization', token)
-								.send({'description': 'Front Brake Bleed', 'completeddate': new Date('11/12/2016')})
-								.end(function(err, res) {
-									chai.request(server)
-										.get('/api/bikes/' + bike._id + '/maintenance/' + res.body.maintenance[0]._id)
-										.set('authorization', token)
-										.end(function(err, res) {
-											res.should.have.status(200);
-											res.should.be.json;
-											res.body.should.be.a('object');
-											res.body.should.have.property('description');
-											res.body.description.should.equal('Front Brake Bleed');
-											res.body.should.have.property('completeddate');
-											res.body.completeddate.should.equal(new Date('11/12/2016').toJSON());
-											done();
-										});
-								});
-						});
-				});
-		});
-
-		it('should update a maintenance item /bikes/:bike_id/maintenance/:id PUT', function(done) {
-			chai.request(server)
-				.post('/api/authenticate')
-				.send({'email': 'jdoe@doe.com', 'password': 'the password'})
-				.end(function(err, res) {
-					var results = res.body;
-				
-					// Adding a new part to the build, should I do this initially? need to figure out.
-					chai.request(server)
-						.get('/api/bikes')
-						.set('authorization', results.token)
-						.end(function(err, res) {
-							chai.request(server)
-								.post('/api/bikes/' + res.body[0]._id + '/maintenance')
-								.set('authorization', results.token)
-								.send({'description': 'Front Barke Bleed', 'completeddate':''})
-								.end(function(err, res) {
-									var bike = res.body;
-									chai.request(server)
-									.put('/api/bikes/' + bike._id + '/maintenance/' + bike.maintenance[0]._id)
-									.set('authorization', results.token)
-									.send({'description': 'Front Brake Bleed', 'completeddate': new Date('11/12/2016')})
-									.end(function(err, res) {
-										res.should.have.status(200);
-										res.should.be.json;
-										res.body.should.be.a('object');
-										res.body.should.have.property('_id');
-										res.body._id.should.equal(bike._id);
-										res.body.should.have.property('name');
-										res.body.name.should.equal('New Bike Name');
-										res.body.should.have.property('year');
-										res.body.year.should.equal(2000);
-										res.body.should.have.property('size');
-										res.body.size.should.equal('Extra Small');
-										res.body.user.should.equal(results.user._id);
-										// res.body.should.have.property('maintenance');
-										// Verify that it added the part to the build.
-										res.body.should.have.property('maintenance');
-										res.body.maintenance.length.should.equal(1);
-										res.body.maintenance[0].should.have.property('_id');
-										res.body.maintenance[0]._id.should.equal(bike.maintenance[0]._id);
-										res.body.maintenance[0].should.have.property('description');
-										res.body.maintenance[0].description.should.equal('Front Brake Bleed');
-										res.body.maintenance[0].should.have.property('completeddate');
-										res.body.maintenance[0].completeddate.should.equal(new Date('11/12/2016').toJSON());
-										done();
-									});
-		
-								});
-						});
-				});
-		});
-
-		it('should delete a maintenance item /bikes/:bike_id/maintenance/:id DELETE', function(done) {
-			chai.request(server)
-				.post('/api/authenticate')
-				.send({'email': 'jdoe@doe.com', 'password': 'the password'})
-				.end(function(err, res) {
-					var results = res.body;
-				
-					chai.request(server)
-						.get('/api/bikes')
-						.set('authorization', results.token)
-						.end(function(err, res) {
-							var bike = res.body[0];
-							chai.request(server)
-								.post('/api/bikes/' + bike._id + '/maintenance')
-								.set('authorization', results.token)
-								.send({'description': 'Rear Brake Bleed', 'completeddate':''})
-								.end(function(err, res) {
-									chai.request(server)
-										.delete('/api/bikes/' + res.body._id + '/maintenance/' + res.body.maintenance[0]._id)
-										.set('authorization', results.token)
-										.end(function(err, res) {
-											res.should.have.status(200);
-											res.should.be.json;
-											res.body.should.be.a('object');
-											res.body.should.have.property('_id');
-											res.body._id.should.equal(bike._id);
-											res.body.should.have.property('name');
-											res.body.name.should.equal('New Bike Name');
-											res.body.should.have.property('year');
-											res.body.year.should.equal(2000);
-											res.body.should.have.property('size');
-											res.body.size.should.equal('Extra Small');
-											res.body.user.should.equal(results.user._id);
-											res.body.maintenance.length.should.equal(0);
-											done();
-										});
 								});
 						});
 				});
