@@ -61,7 +61,7 @@ describe('Bikes', function() {
 				
 				chai.request(server)
 					.get('/api/bikes')
-					.set('authorization', results.token)
+					.set('authorization', 'Bearer: ' + results.token)
 					.end(function(err, res) {
 						res.should.have.status(200);
 						res.should.be.json;
@@ -90,7 +90,7 @@ describe('Bikes', function() {
 		
 				chai.request(server)
 				.post('/api/bikes')
-				.set('authorization', results.token)
+				.set('authorization', 'Bearer: ' + results.token)
 				.send({'name': 'Transition', 'year': '2016', 'size': 'Large'})
 				.end(function(err, res) {
 					res.should.have.status(200);
@@ -127,7 +127,7 @@ describe('Bikes', function() {
 				newBike.save(function(err, data) {
 					chai.request(server)
 						.get('/api/bikes/' + data.id)
-						.set('authorization', results.token)
+						.set('authorization', 'Bearer: ' + results.token)
 						.end(function(err, res) {
 							res.should.have.status(200);
 							res.should.be.json;
@@ -157,11 +157,11 @@ describe('Bikes', function() {
 				
 				chai.request(server)
 					.get('/api/bikes')
-					.set('authorization',results.token)
+					.set('authorization', 'Bearer: ' + results.token)
 					.end(function(err, res) {
 						chai.request(server)
 							.put('/api/bikes/' + res.body[0]._id)
-							.set('authorization', results.token)
+							.set('authorization', 'Bearer: ' + results.token)
 							.send({'name': 'Rocky Slayer', 'year': '1999', 'size': 'Extra Large'})
 							.end(function(err, res) {
 								res.should.have.status(200);
@@ -190,11 +190,11 @@ describe('Bikes', function() {
 			
 				chai.request(server)
 					.get('/api/bikes')
-					.set('authorization', token)
+					.set('authorization', 'Bearer: ' + token)
 					.end(function(err, res) {
 						chai.request(server)
 							.delete('/api/bikes/' + res.body[0]._id)
-							.set('authorization', token)
+							.set('authorization', 'Bearer: ' + token)
 							.end(function(err, res) {
 								res.should.have.status(200);
 								res.should.be.json;
@@ -216,17 +216,17 @@ describe('Bikes', function() {
 				
 					chai.request(server)
 						.get('/api/bikes')
-						.set('authorization', token)
+						.set('authorization', 'Bearer: ' + token)
 						.end(function(err, res) {
 							var bikeId = res.body[0]._id;
 							chai.request(server)
 								.post('/api/bikes/' + bikeId + '/build')
-								.set('authorization', token)
+								.set('authorization', 'Bearer: ' + token)
 								.send({'description': 'Chromag Bars', 'url':'www.chromag.com'})
 								.end(function(err, res) {
 									chai.request(server)
 										.get('/api/bikes/' + bikeId + '/build')
-										.set('authorization', token)
+										.set('authorization', 'Bearer: ' + token)
 										.end(function(err, res) {
 											res.should.have.status(200);
 											res.should.be.json;
@@ -253,12 +253,12 @@ describe('Bikes', function() {
 				
 				chai.request(server)
 					.get('/api/bikes')
-					.set('authorization', results.token)
+					.set('authorization', 'Bearer ' + results.token)
 					.end(function(err, res) {
 						var bikeId = res.body[0]._id;
 						chai.request(server)
 							.post('/api/bikes/' + bikeId + '/build')
-							.set('authorization', results.token)
+							.set('authorization', 'Bearer ' + results.token)
 							.send({'description': 'Chromag Bars', 'url':'www.chromag.com'})
 							.end(function(err, res) {
 								res.should.have.status(200);
@@ -297,17 +297,17 @@ describe('Bikes', function() {
 				
 				chai.request(server)
 					.get('/api/bikes')
-					.set('authorization', token)
+					.set('authorization', 'Bearer: ' + token)
 					.end(function(err, res) {
 						var bike = res.body[0];
 						chai.request(server)
 							.post('/api/bikes/' + bike._id + '/build')
-							.set('authorization', token)
+							.set('authorization', 'Bearer: ' + token)
 							.send({'description': 'Chromag Bars', 'url':'www.chromag.com'})
 							.end(function(err, res) {
 								chai.request(server)
 									.get('/api/bikes/' + bike._id + '/build/' + res.body.build[0]._id)
-									.set('authorization', token)
+									.set('authorization', 'Bearer: ' + token)
 									.end(function(err, res) {
 										// console.log(res);
 										res.should.have.status(200);
@@ -331,72 +331,21 @@ describe('Bikes', function() {
 				.end(function(err, res) {
 					var results = res.body;
 				
-				// Adding a new part to the build, should I do this initially? need to figure out.
-				chai.request(server)
-					.get('/api/bikes')
-					.set('authorization', results.token)
-					.end(function(err, res) {
-						chai.request(server)
-							.post('/api/bikes/' + res.body[0]._id + '/build')
-							.set('authorization', results.token)
-							.send({'description': 'Chromag Bars', 'url':'www.chromag.com'})
-							.end(function(err, res) {
-								var bike = res.body;
-								chai.request(server)
-								.put('/api/bikes/' + bike._id + '/build/' + bike.build[0]._id)
-								.set('authorization', results.token)
-								.send({'description': 'Raceface Bars', 'url': 'www.raceface.com'})
+					// Adding a new part to the build, should I do this initially? need to figure out.
+					chai.request(server)
+						.get('/api/bikes')
+						.set('authorization', 'Bearer ' + results.token)
+						.end(function(err, res) {
+							chai.request(server)
+								.post('/api/bikes/' + res.body[0]._id + '/build')
+								.set('authorization', 'Bearer ' + results.token)
+								.send({'description': 'Chromag Bars', 'url':'www.chromag.com'})
 								.end(function(err, res) {
-									res.should.have.status(200);
-									res.should.be.json;
-									res.body.should.be.a('object');
-									res.body.should.have.property('_id');
-									res.body._id.should.equal(bike._id);
-									res.body.should.have.property('name');
-									res.body.name.should.equal('New Bike Name');
-									res.body.should.have.property('year');
-									res.body.year.should.equal(2000);
-									res.body.should.have.property('size');
-									res.body.size.should.equal('Extra Small');
-									res.body.user.should.equal(results.user._id);
-									// res.body.should.have.property('maintenance');
-									// Verify that it added the part to the build.
-									res.body.should.have.property('build');
-									res.body.build.length.should.equal(1);
-									res.body.build[0].should.have.property('_id');
-									res.body.build[0]._id.should.equal(bike.build[0]._id);
-									res.body.build[0].should.have.property('description');
-									res.body.build[0].description.should.equal('Raceface Bars');
-									res.body.build[0].should.have.property('url');
-									res.body.build[0].url.should.equal('www.raceface.com');
-									done();
-								});
-	
-							});
-					});
-				});
-		});
-
-		it('should delete a build part /bikes/:bike_id/build/:id DELETE', function(done) {
-			chai.request(server)
-				.post('/api/authenticate')
-				.send({'email': 'jdoe@doe.com', 'password': 'the password'})
-				.end(function(err, res) {
-					var results = res.body;
-				
-				chai.request(server)
-					.get('/api/bikes')
-					.set('authorization', results.token)
-					.end(function(err, res) {
-						var bike = res.body[0];
-						chai.request(server)
-							.post('/api/bikes/' + bike._id + '/build')
-							.set('authorization', results.token)
-							.send({'description': 'Chromag Bars', 'url':'www.chromag.com'})
-							.end(function(err, res) {
-								chai.request(server)
-									.delete('/api/bikes/' + res.body._id + '/build/' + res.body.build[0]._id)
-									.set('authorization', results.token)
+									var bike = res.body;
+									chai.request(server)
+									.put('/api/bikes/' + bike._id + '/build/' + bike.build[0]._id)
+									.set('authorization', 'Bearer ' + results.token)
+									.send({'description': 'Raceface Bars', 'url': 'www.raceface.com'})
 									.end(function(err, res) {
 										res.should.have.status(200);
 										res.should.be.json;
@@ -410,12 +359,63 @@ describe('Bikes', function() {
 										res.body.should.have.property('size');
 										res.body.size.should.equal('Extra Small');
 										res.body.user.should.equal(results.user._id);
-										res.body.build.length.should.equal(0);
+										// res.body.should.have.property('maintenance');
+										// Verify that it added the part to the build.
+										res.body.should.have.property('build');
+										res.body.build.length.should.equal(1);
+										res.body.build[0].should.have.property('_id');
+										res.body.build[0]._id.should.equal(bike.build[0]._id);
+										res.body.build[0].should.have.property('description');
+										res.body.build[0].description.should.equal('Raceface Bars');
+										res.body.build[0].should.have.property('url');
+										res.body.build[0].url.should.equal('www.raceface.com');
 										done();
 									});
-							});
-						
-					});
+		
+								});
+						});
+				});
+		});
+
+		it('should delete a build part /bikes/:bike_id/build/:id DELETE', function(done) {
+			chai.request(server)
+				.post('/api/authenticate')
+				.send({'email': 'jdoe@doe.com', 'password': 'the password'})
+				.end(function(err, res) {
+					var results = res.body;
+				
+					chai.request(server)
+						.get('/api/bikes')
+						.set('authorization', 'Bearer ' + results.token)
+						.end(function(err, res) {
+							var bike = res.body[0];
+							chai.request(server)
+								.post('/api/bikes/' + bike._id + '/build')
+								.set('authorization', 'Bearer ' + results.token)
+								.send({'description': 'Chromag Bars', 'url':'www.chromag.com'})
+								.end(function(err, res) {
+									chai.request(server)
+										.delete('/api/bikes/' + res.body._id + '/build/' + res.body.build[0]._id)
+										.set('authorization', 'Bearer ' + results.token)
+										.end(function(err, res) {
+											res.should.have.status(200);
+											res.should.be.json;
+											res.body.should.be.a('object');
+											res.body.should.have.property('_id');
+											res.body._id.should.equal(bike._id);
+											res.body.should.have.property('name');
+											res.body.name.should.equal('New Bike Name');
+											res.body.should.have.property('year');
+											res.body.year.should.equal(2000);
+											res.body.should.have.property('size');
+											res.body.size.should.equal('Extra Small');
+											res.body.user.should.equal(results.user._id);
+											res.body.build.length.should.equal(0);
+											done();
+										});
+								});
+							
+						});
 				});
 		});
 	});
@@ -430,17 +430,17 @@ describe('Bikes', function() {
 				
 					chai.request(server)
 						.get('/api/bikes')
-						.set('authorization', token)
+						.set('authorization', 'Bearer: ' + token)
 						.end(function(err, res) {
 							var bikeId = res.body[0]._id;
 							chai.request(server)
 								.post('/api/bikes/' + bikeId + '/wanted')
-								.set('authorization', token)
+								.set('authorization', 'Bearer: ' + token)
 								.send({'description': 'Chromag Bars', 'url':'www.chromag.com'})
 								.end(function(err, res) {
 									chai.request(server)
 										.get('/api/bikes/' + bikeId + '/wanted')
-										.set('authorization', token)
+										.set('authorization', 'Bearer: ' + token)
 										.end(function(err, res) {
 											res.should.have.status(200);
 											res.should.be.json;
@@ -467,12 +467,12 @@ describe('Bikes', function() {
 				
 					chai.request(server)
 						.get('/api/bikes')
-						.set('authorization', results.token)
+						.set('authorization', 'Bearer ' + results.token)
 						.end(function(err, res) {
 							var bikeId = res.body[0]._id;
 							chai.request(server)
 								.post('/api/bikes/' + bikeId + '/wanted')
-								.set('authorization', results.token)
+								.set('authorization', 'Bearer ' + results.token)
 								.send({'description': 'Chromag Bars', 'url':'www.chromag.com'})
 								.end(function(err, res) {
 									res.should.have.status(200);
@@ -511,17 +511,17 @@ describe('Bikes', function() {
 				
 					chai.request(server)
 						.get('/api/bikes')
-						.set('authorization', token)
+						.set('authorization', 'Bearer: ' + token)
 						.end(function(err, res) {
 							var bike = res.body[0];
 							chai.request(server)
 								.post('/api/bikes/' + bike._id + '/wanted')
-								.set('authorization', token)
+								.set('authorization', 'Bearer: ' + token)
 								.send({'description': 'Chromag Bars', 'url':'www.chromag.com'})
 								.end(function(err, res) {
 									chai.request(server)
 										.get('/api/bikes/' + bike._id + '/wanted/' + res.body.wanted[0]._id)
-										.set('authorization', token)
+										.set('authorization', 'Bearer: ' + token)
 										.end(function(err, res) {
 											res.should.have.status(200);
 											res.should.be.json;
@@ -547,17 +547,17 @@ describe('Bikes', function() {
 					// Adding a new part to the build, should I do this initially? need to figure out.
 					chai.request(server)
 						.get('/api/bikes')
-						.set('authorization', results.token)
+						.set('authorization', 'Bearer ' + results.token)
 						.end(function(err, res) {
 							chai.request(server)
 								.post('/api/bikes/' + res.body[0]._id + '/wanted')
-								.set('authorization', results.token)
+								.set('authorization', 'Bearer ' + results.token)
 								.send({'description': 'Chromag Bars', 'url':'www.chromag.com'})
 								.end(function(err, res) {
 									var bike = res.body;
 									chai.request(server)
 									.put('/api/bikes/' + bike._id + '/wanted/' + bike.wanted[0]._id)
-									.set('authorization', results.token)
+									.set('authorization', 'Bearer ' + results.token)
 									.send({'description': 'Raceface Bars', 'url': 'www.raceface.com'})
 									.end(function(err, res) {
 										res.should.have.status(200);
@@ -599,17 +599,17 @@ describe('Bikes', function() {
 				
 					chai.request(server)
 						.get('/api/bikes')
-						.set('authorization', results.token)
+						.set('authorization', 'Bearer ' + results.token)
 						.end(function(err, res) {
 							var bike = res.body[0];
 							chai.request(server)
 								.post('/api/bikes/' + bike._id + '/wanted')
-								.set('authorization', results.token)
+								.set('authorization', 'Bearer ' + results.token)
 								.send({'description': 'Chromag Bars', 'url':'www.chromag.com'})
 								.end(function(err, res) {
 									chai.request(server)
 										.delete('/api/bikes/' + res.body._id + '/wanted/' + res.body.wanted[0]._id)
-										.set('authorization', results.token)
+										.set('authorization', 'Bearer ' + results.token)
 										.end(function(err, res) {
 											res.should.have.status(200);
 											res.should.be.json;
@@ -640,17 +640,17 @@ describe('Bikes', function() {
 				
 					chai.request(server)
 						.get('/api/bikes')
-						.set('authorization', results.token)
+						.set('authorization', 'Bearer ' + results.token)
 						.end(function(err, res) {
 							var bike = res.body[0];
 							chai.request(server)
 								.post('/api/bikes/' + bike._id + '/wanted')
-								.set('authorization', results.token)
+								.set('authorization', 'Bearer ' + results.token)
 								.send({'description': 'Chromag Bars', 'url':'www.chromag.com'})
 								.end(function(err, res) {
 									chai.request(server)
 										.get('/api/bikes/' + bike._id + '/wanted/' + res.body.wanted[0]._id + '/got')
-										.set('authorization', results.token)
+										.set('authorization', 'Bearer ' + results.token)
 										.end(function(err, res) {
 											res.should.have.status(200);
 											res.should.be.json;
@@ -690,17 +690,17 @@ describe('Bikes', function() {
 				
 					chai.request(server)
 						.get('/api/bikes')
-						.set('authorization', token)
+						.set('authorization', 'Bearer: ' + token)
 						.end(function(err, res) {
 							var bikeId = res.body[0]._id;
 							chai.request(server)
 								.post('/api/bikes/' + bikeId + '/maintenance')
-								.set('authorization', token)
+								.set('authorization', 'Bearer: ' + token)
 								.send({'description': 'Front Brake Bleed', 'completeddate': new Date('11/12/2016')})
 								.end(function(err, res) {
 									chai.request(server)
 										.get('/api/bikes/' + bikeId + '/maintenance')
-										.set('authorization', token)
+										.set('authorization', 'Bearer: ' + token)
 										.end(function(err, res) {
 											res.should.have.status(200);
 											res.should.be.json;
@@ -727,12 +727,12 @@ describe('Bikes', function() {
 				
 					chai.request(server)
 						.get('/api/bikes')
-						.set('authorization', results.token)
+						.set('authorization', 'Bearer ' + results.token)
 						.end(function(err, res) {
 							var bikeId = res.body[0]._id;
 							chai.request(server)
 								.post('/api/bikes/' + bikeId + '/maintenance')
-								.set('authorization', results.token)
+								.set('authorization', 'Bearer ' + results.token)
 								.send({'description': 'Front Brake Bleed', 'completeddate': new Date('11/12/2016') })
 								.end(function(err, res) {
 									res.should.have.status(200);

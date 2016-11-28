@@ -64,17 +64,17 @@ describe('Maintenance', function() {
 				
 					chai.request(server)
 						.get('/api/bikes')
-						.set('authorization', token)
+						.set('authorization', 'Bearer ' + token)
 						.end(function(err, res) {
 							var bike = res.body[0];
 							chai.request(server)
 								.post('/api/bikes/' + bike._id + '/maintenance')
-								.set('authorization', token)
+								.set('authorization', 'Bearer ' + token)
 								.send({'description': 'Front Brake Bleed', 'completeddate': new Date('11/12/2016')})
 								.end(function(err, res) {
 									chai.request(server)
 										.get('/api/maintenance/' + res.body.maintenance[0]._id)
-										.set('authorization', token)
+										.set('authorization', 'Bearer ' + token)
 										.end(function(err, res) {
 											res.should.have.status(200);
 											res.should.be.json;
@@ -100,17 +100,17 @@ describe('Maintenance', function() {
 					// Adding a new part to the build, should I do this initially? need to figure out.
 					chai.request(server)
 						.get('/api/bikes')
-						.set('authorization', results.token)
+						.set('authorization', 'Bearer ' + results.token)
 						.end(function(err, res) {
 							chai.request(server)
 								.post('/api/bikes/' + res.body[0]._id + '/maintenance')
-								.set('authorization', results.token)
+								.set('authorization', 'Bearer ' + results.token)
 								.send({'description': 'Front Barke Bleed', 'completeddate':''})
 								.end(function(err, res) {
 									var bike = res.body;
 									chai.request(server)
 									.put('/api/maintenance/' + bike.maintenance[0]._id)
-									.set('authorization', results.token)
+									.set('authorization', 'Bearer ' + results.token)
 									.send({'description': 'Front Brake Bleed', 'completeddate': new Date('11/12/2016')})
 									.end(function(err, res) {
 										res.should.have.status(200);
@@ -139,12 +139,12 @@ describe('Maintenance', function() {
 				
 					chai.request(server)
 						.get('/api/bikes')
-						.set('authorization', results.token)
+						.set('authorization', 'Bearer ' + results.token)
 						.end(function(err, res) {
 							var bike = res.body[0];
 							chai.request(server)
 								.post('/api/bikes/' + bike._id + '/maintenance')
-								.set('authorization', results.token)
+								.set('authorization', 'Bearer ' + results.token)
 								.send({'description': 'Rear Brake Bleed', 'completeddate':''})
 								.end(function(err, res) {
 									res.body.maintenance.length.should.equal(1);
@@ -152,14 +152,14 @@ describe('Maintenance', function() {
 
 									chai.request(server)
 										.delete('/api/maintenance/' + res.body.maintenance[0]._id)
-										.set('authorization', results.token)
+										.set('authorization', 'Bearer ' + results.token)
 										.end(function(err, res) {
 											res.should.have.status(200);
 											res.should.be.json;
 
 											chai.request(server)
 												.get('/api/bikes/' + bike._id)
-												.set('authorization', results.token)
+												.set('authorization', 'Bearer ' + results.token)
 												.end(function(err, res) {
 													res.body.maintenance.length.should.equal(0);
 

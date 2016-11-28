@@ -78,20 +78,14 @@ module.exports = function(router) {
         
         // will need to ensure proper authentication as well as routing to the correct users bike information.
         // Not worried about this just yet though.
-        
-        // Should also look at authorization: Bearer [ TOKEN HERE ]
-        // http://angular-tips.com/blog/2014/05/json-web-tokens-examples/
-
-        // Should maybe do something like this... 
-        // if (req.param('token')) {
-        //    token = req.param('token');
-        //    // We delete the token from param to not mess with blueprints
-        //    delete req.query.token;
 
         var token = req.params.token || req.headers.authorization;
         if (token) {
-              
-                jwt.verify(token, process.env.SECRET, function(err, decoded) {
+                
+                var bearer = token.split(" ");
+                var bearerToken = bearer[1];
+
+                jwt.verify(bearerToken, process.env.SECRET, function(err, decoded) {
                     if (err)
                         return res.status(403).json({message: 'Failed to authenticate token'});
                     

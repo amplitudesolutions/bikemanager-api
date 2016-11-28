@@ -96,7 +96,7 @@ describe('Users', function() {
 				
 				chai.request(server)
 					.get('/api/users')
-					.set('authorization', token)
+					.set('authorization', 'Bearer ' + token)
 					.end(function(err, res) {
 						res.should.have.status(200);
 						res.should.be.json;
@@ -149,7 +149,7 @@ describe('Users', function() {
 						
 						chai.request(server)
 							.get('/api/users')
-							.set('authorization', token)
+							.set('authorization', 'Bearer ' + token)
 							.end(function(err, res) {
 								res.body.should.be.a('array');
 								res.body.length.should.equal(1);
