@@ -8,6 +8,8 @@ var User = require('../app/models/user');
 
 var should = chai.should();
 
+var authUser;
+
 chai.use(chaiHttp);
 
 describe('Users', function() {
@@ -57,6 +59,8 @@ describe('Users', function() {
 				res.body.user.email.should.equal('jdoe@doe.com');
 				res.body.user.should.have.property('_id');
 				res.body.user.should.not.have.property('password');
+
+				authUser = res.body;
 				done();
 			});
 	});
@@ -89,29 +93,21 @@ describe('Users', function() {
 
 	it('should get all users /users GET', function(done) {
 		chai.request(server)
-			.post('/api/authenticate')
-			.send({'email': 'jdoe@doe.com', 'password': 'the password'})
+			.get('/api/users')
+			.set('authorization', 'Bearer ' + authUser.token)
 			.end(function(err, res) {
-				var token = res.body.token;
-				
-				chai.request(server)
-					.get('/api/users')
-					.set('authorization', 'Bearer ' + token)
-					.end(function(err, res) {
-						res.should.have.status(200);
-						res.should.be.json;
-						res.body.should.be.a('array');
-						res.body.length.should.equal(1);
-						res.body[0].should.have.property('_id');
-						res.body[0].should.have.property('name');
-						res.body[0].name.should.equal('John Doe');
-						res.body[0].should.have.property('email');
-						res.body[0].email.should.equal('jdoe@doe.com');
-						res.body[0].should.not.have.property('password');
-						done();
-					});
+				res.should.have.status(200);
+				res.should.be.json;
+				res.body.should.be.a('array');
+				res.body.length.should.equal(1);
+				res.body[0].should.have.property('_id');
+				res.body[0].should.have.property('name');
+				res.body[0].name.should.equal('John Doe');
+				res.body[0].should.have.property('email');
+				res.body[0].email.should.equal('jdoe@doe.com');
+				res.body[0].should.not.have.property('password');
+				done();
 			});
-			
 	});
 	
 	it('should add a new user /users POST', function(done) {
@@ -140,27 +136,20 @@ describe('Users', function() {
 				res.should.have.status(409);
 				res.should.be.json;
 				res.should.be.a('object')
-				
-				chai.request(server)
-					.post('/api/authenticate')
-					.send({'email': 'jdoe@doe.com', 'password': 'the password'})
-					.end(function(err, res) {
-						var token = res.body.token;
 						
-						chai.request(server)
-							.get('/api/users')
-							.set('authorization', 'Bearer ' + token)
-							.end(function(err, res) {
-								res.body.should.be.a('array');
-								res.body.length.should.equal(1);
-								res.body[0].should.have.property('_id');
-								res.body[0].should.have.property('name');
-								res.body[0].name.should.equal('John Doe');
-								res.body[0].should.have.property('email');
-								res.body[0].email.should.equal('jdoe@doe.com');
-								res.body[0].should.not.have.property('password');
-								done();
-							});
+				chai.request(server)
+					.get('/api/users')
+					.set('authorization', 'Bearer ' + authUser.token)
+					.end(function(err, res) {
+						res.body.should.be.a('array');
+						res.body.length.should.equal(1);
+						res.body[0].should.have.property('_id');
+						res.body[0].should.have.property('name');
+						res.body[0].name.should.equal('John Doe');
+						res.body[0].should.have.property('email');
+						res.body[0].email.should.equal('jdoe@doe.com');
+						res.body[0].should.not.have.property('password');
+						done();
 					});
 			});
 	});
