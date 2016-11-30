@@ -6,7 +6,7 @@ var Schema = mongoose.Schema;
 var MaintenanceSchema = new Schema({
     description: String,
     completeddate: Date,
-    bike: { type: Schema.Types.ObjectId, ref: 'bike', required: true }
+    bike: { type: Schema.Types.ObjectId, ref: 'Bike', required: true }
 });
 
 MaintenanceSchema.pre("remove", function(next) {
@@ -16,7 +16,7 @@ MaintenanceSchema.pre("remove", function(next) {
 		{multi:true},
 		next
 	);
-next();
+	next();
 });
 
 module.exports = mongoose.model("Maintenance", MaintenanceSchema);

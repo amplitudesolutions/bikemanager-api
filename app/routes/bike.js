@@ -279,14 +279,63 @@ module.exports = function(router) {
     
     router.route("/bikes/:bike_id/maintenance")
         .get(function(req, res) {
-            Bike.findById(req.params.bike_id)
-                .populate('maintenance')
-                .exec(function(err, bike) {
+            /*
+                Returns all the maintenance items for a given bike (bike_id)
+                Returns 20 maintenance item records, completed or not
+                
+                @Param   type    description 
+                bike_id  url     bike id to return specified items for
+                top      query   the maximum number of records to return
+                start    query   return records starting at this date
+                end      query   return records before this date.
+                
+                If completed date is null, that means the item is not completed. If you specify start or end, it will not return any items where completedate is null.
+            */
+            
+            var query = { 
+                bike: req.params.bike_id
+            };
+            
+            // @top
+            var recordLimit = 20;
+            if (req.query.top) {
+                recordLimit = parseInt(req.query.top);
+            }
+            
+            // Check if start or end passed in as query string
+            if (req.query.start || req.query.end) {
+                query.completeddate = {};
+                
+                // @start
+                if (req.query.start) {
+                    query.completeddate['$gte'] = new Date(req.query.start);
+                }
+                
+                // @end=
+                if (req.query.end) {
+                    query.completeddate['$lte'] = new Date(req.query.end);
+                }
+            }
+            
+            // PAGING
+            // var page = 0;
+            // if (req.query.page) {
+            //     page = Math.max(0, req.param('page'));
+            // }
+            
+            // specify fields to return
+            Maintenance.find(query)
+                // .populate()
+                .limit(recordLimit)
+                // .skip(recordLimit * page)  // PAGING
+                .sort({completeddate: 1, description: 1})
+                .exec(function(err, maintenance) {
                     if (err)
                         res.send(err);
-
-                    res.json(bike.maintenance);
-                });
+                        
+                    // res.json({maintenance, totalCount: });
+                    res.json(maintenance);
+                })
         })
         
         .post(function(req, res) {
