@@ -3,7 +3,10 @@ var Bike = require('../models/bike');
 var Maintenance = require('../models/bike-maintenance');
 
 // Need to set defaults for Populate (this is only for maintenance)
-var popOptions = {path: 'maintenance', match: {completeddate: null}};
+var popOptions = { 
+    path: 'maintenance', 
+    match: { completeddate: { $eq: null } },
+    options: { sort: { 'description': 1 } } };
 
 
 module.exports = function(router) {
@@ -16,6 +19,7 @@ module.exports = function(router) {
                 if (err)
                     res.send(err);
 
+                console.log(bikes);
                 res.status(200).json(bikes);
             });
         })
@@ -358,7 +362,7 @@ module.exports = function(router) {
                             if (err)
                                 res.send(err);
                                 
-                            Bike.populate(bike, 'maintenance', function(err, bike) {
+                            Bike.populate(bike, popOptions, function(err, bike) {
                                 res.json(bike);    
                             })
                                 
