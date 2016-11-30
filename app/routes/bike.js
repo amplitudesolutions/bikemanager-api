@@ -8,7 +8,6 @@ var popOptions = {
     match: { completeddate: { $eq: null } },
     options: { sort: { 'description': 1 } } };
 
-
 module.exports = function(router) {
     router.route('/bikes')
         
@@ -19,7 +18,7 @@ module.exports = function(router) {
                 if (err)
                     res.send(err);
 
-                console.log(bikes);
+                // console.log(bikes);
                 res.status(200).json(bikes);
             });
         })
@@ -344,7 +343,7 @@ module.exports = function(router) {
         
         .post(function(req, res) {
             Bike.findById(req.params.bike_id)
-                .populate('maintenance')
+                .populate(popOptions)
                 .exec(function(err, bike) {
                     if (err)
                         res.send(err);
@@ -362,16 +361,10 @@ module.exports = function(router) {
                             if (err)
                                 res.send(err);
                                 
-                            Bike.populate(bike, popOptions, function(err, bike) {
-                                res.json(bike);    
-                            })
-                                
+                            res.json(bike);
                         });
                         
                     });
-                    //bike.maintenance.push({  });
-                    
-                    
                 });
         })
         

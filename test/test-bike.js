@@ -6,6 +6,7 @@ var server = require('../server');
 
 var Bike = require('../app/models/bike');
 var User = require('../app/models/user');
+var Maintenance = require('../app/models/bike-maintenance');
 
 var should = chai.should();
 
@@ -17,6 +18,7 @@ describe('Bikes', function() {
 
 	User.collection.drop();
 	Bike.collection.drop();
+	Maintenance.collection.drop();
 
 	beforeEach(function(done) {
 		// Create a default user in db.
@@ -57,6 +59,7 @@ describe('Bikes', function() {
 	afterEach(function(done) {
 		User.collection.drop();
 		Bike.collection.drop();
+		Maintenance.collection.drop();
 		done();
 	});
 
@@ -585,7 +588,7 @@ describe('Bikes', function() {
 					chai.request(server)
 						.post('/api/bikes/' + bikeId + '/maintenance')
 						.set('authorization', 'Bearer: ' + authUser.token)
-						.send({'description': 'Front Brake Bleed', 'completeddate': new Date('11/12/2016')})
+						.send({'description': 'Some Maintenance Item', 'completeddate': new Date('11/12/2016')})
 						.end(function(err, res) {
 							chai.request(server)
 								.get('/api/bikes/' + bikeId + '/maintenance')
@@ -597,7 +600,7 @@ describe('Bikes', function() {
 									res.body.length.should.equal(1);
 									res.body[0].should.have.property('_id');
 									res.body[0].should.have.property('description');
-									res.body[0].description.should.equal('Front Brake Bleed');
+									res.body[0].description.should.equal('Some Maintenance Item');
 									res.body[0].should.have.property('completeddate');
 									res.body[0].completeddate.should.equal(new Date('11/12/2016').toJSON());
 									done();

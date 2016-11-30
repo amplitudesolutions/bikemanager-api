@@ -6,11 +6,11 @@ var Schema = mongoose.Schema;
 var MaintenanceSchema = new Schema({
     description: String,
     completeddate: Date,
-    bike: { type: Schema.Types.ObjectId, ref: 'Bike', required: true }
+    bike: { type: Schema.Types.ObjectId, ref: "Bike", required: true }
 });
 
 MaintenanceSchema.pre("remove", function(next) {
-	this.model('Bike').update(
+	this.model("Bike").update(
 		{maintenance: this._id},
 		{$pull: {maintenance: this._id}},
 		{multi:true},
