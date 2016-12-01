@@ -321,23 +321,23 @@ module.exports = function(router) {
             }
             
             // PAGING
-            // var page = 0;
-            // if (req.query.page) {
-            //     page = Math.max(0, req.param('page'));
-            // }
+            var page = 0;
+            if (req.query.page) {
+                page = Math.max(0, req.query.page);
+            }
             
             // specify fields to return
             Maintenance.find(query)
                 // .populate()
                 .limit(recordLimit)
-                // .skip(recordLimit * page)  // PAGING
-                .sort({completeddate: 1, description: 1})
+                .skip(recordLimit * page)  // PAGING
+                .sort({completeddate: -1, description: 1})
                 .exec(function(err, maintenance) {
                     if (err)
                         res.send(err);
                         
                     // res.json({maintenance, totalCount: });
-                    res.json(maintenance);
+                    res.status(200).json(maintenance);
                 })
         })
         
@@ -360,7 +360,7 @@ module.exports = function(router) {
                         bike.save(function(err) {
                             if (err)
                                 res.send(err);
-                                
+
                             res.json(bike);
                         });
                         
